@@ -1,0 +1,28 @@
+{
+  "name": "project19",
+  "version": "0.0.1",
+  "description": "Stream chat bot with Web UI. Challenge for the holidays.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KararTY/Project19.git"
+  },
+  "author": "Karar Al-Remahy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KararTY/Project19/issues"
+  },
+  "homepage": "https://github.com/KararTY/Project19#readme",
+  "devDependencies": {
+    "cross-env": "^6.0.3",
+    "eslint": "^6.7.2",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
+  },
+  "dependencies": {}
+}

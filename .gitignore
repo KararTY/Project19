@@ -1,0 +1,8 @@
+# Node modules
+node_modules
+package-lock.json
+
+tmp
+
+# Environment variables, never commit this file
+.env

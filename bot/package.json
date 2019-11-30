@@ -1,0 +1,22 @@
+{
+  "name": "project19-client",
+  "version": "0.0.1",
+  "description": "Project19 chat bots.",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "project19",
+    "client-app"
+  ],
+  "author": "Karar Al-Remahy",
+  "license": "ISC",
+  "private": true,
+  "dependencies": {
+    "@adonisjs/websocket-packet": "^1.0.6",
+    "@mixer/client-node": "^3.5.0",
+    "dank-twitch-irc": "^3.0.5",
+    "dotenv": "^8.2.0"
+  }
+}
