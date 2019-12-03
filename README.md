@@ -1,6 +1,9 @@
 # Project19
 Chat bot with Web UI. Challenge for the holidays.
 
+## WORK IN PROGRESS v0.1.0
+Since the project is still a work in progress, all updates will most likely introduce breaking changes. This is not a production-ready project.
+
 ## Technologies
   * AdonisJS
   * dank-twitch-irc
@@ -16,6 +19,10 @@ Chat bot with Web UI. Challenge for the holidays.
   * `cd .\bot\`
   * `npm i`
   * `npm start`
+### The database
+  * Install PostgreSQL. Make sure uuid-ossp is included in your installation, which it should be on PostgreSQL versions +9.4. **My personal setup runs PostgreSQL version 12.**
+  * `cd .\web\`
+  * `npm run migration`
 ### Running the website
   * `cd .\web\`
   * `npm i`
@@ -36,3 +43,6 @@ Chat bot with Web UI. Challenge for the holidays.
   * Login system in Web UI.
     * Twitch oauth.
     * Does Mixer have auth support?
+
+## ISC License
+See [LICENSE](LICENSE). Karar Al-Remahy

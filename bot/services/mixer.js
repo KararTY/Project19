@@ -18,8 +18,8 @@ client.use(new Mixer.OAuthProvider(client, {
 async function initialize (events, testChannels, isdebug) {
   isDebug = isdebug
 
-  events.on('socketJoinAck', (topic) => {
-    if (topic === 'chat:raw') {
+  events.on('socketJoinAck', topic => {
+    if (topic === events.socket.topic) {
       websocketFullyOnline = true
       if (messages.length > 0) {
         events.emit('chat', { mixerOfflineBatch: messages })
@@ -32,7 +32,7 @@ async function initialize (events, testChannels, isdebug) {
     websocketFullyOnline = false
   })
 
-  events.on('keepMixerMessage', (data) => {
+  events.on('keepMixerMessage', data => {
     if (data.mixer) messages.push(data.mixer)
     else if (data.mixerOfflineBatch) messages.push(...data.mixerOfflineBatch)
   })
@@ -45,13 +45,13 @@ async function initialize (events, testChannels, isdebug) {
       const channelData = await client.request('GET', `/channels/${channelName}`)
       // Our chat connection details.
       const channel = await new Mixer.ChatService(client).join(channelData.body.id)
-      const body = channel.body
-      if (isDebug) console.log('Mixer:', body)
-      await createChatSocket(channelData.body.userId, channelData.body.id, body.endpoints, body.authkey, events)
+
+      if (isDebug) console.log('Mixer:', channel)
+      await createChatSocket(channelData, channel, events)
     }
-  } catch (error) {
+  } catch (err) {
     console.error('Mixer: Something went wrong.')
-    console.error('Mixer:', error)
+    console.error('Mixer:', err)
   }
 }
 
@@ -63,8 +63,12 @@ async function initialize (events, testChannels, isdebug) {
 * @param {string} authkey An authentication key to connect with
 * @returns {Promise.<>}
 */
-async function createChatSocket (userId, channelId, endpoints, authkey, events) {
+async function createChatSocket (channelData, channel, events) {
+  const { userId, id: channelId, token } = channelData.body
+  const { endpoints, authkey } = channel.body
+
   const socket = new Mixer.Socket(ws, endpoints).boot()
+  socket.__token = token
 
   if (isDebug) console.log('Mixer:', userId, channelId, endpoints, authkey)
 
@@ -79,19 +83,21 @@ async function createChatSocket (userId, channelId, endpoints, authkey, events) 
 
     // Listen for chat messages. Note you will also receive your own!
     socket.on('ChatMessage', data => {
-      if (isDebug) console.log(`Mixer: [Mixer#${data.channel}] ${data.user_name}: ${data.message.message.map(message => message.text).join('')}`)
+      data.token = socket.__token.toLowerCase()
+
+      if (isDebug) console.log(`Mixer: #${socket.__token} ${data.user_name}: ${data.message.message.map(message => message.text).join('')}`)
       if (websocketFullyOnline) events.emit('chat', { mixer: data })
       else messages.push(data)
     })
 
     // Listen for socket errors. You will need to handle these here.
-    socket.on('error', error => {
+    socket.on('error', err => {
       console.error('Mixer: Socket error.')
-      console.error('Mixer:', error)
+      console.error('Mixer:', err)
     })
-  } catch (error) {
+  } catch (err) {
     console.error('Mixer: Oh no! An error occurred.')
-    console.error('Mixer:', error)
+    console.error('Mixer:', err)
   }
 }
 

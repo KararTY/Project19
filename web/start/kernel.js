@@ -12,7 +12,9 @@ const Server = use('Server')
 | match.
 |
 */
-const globalMiddleware = []
+const globalMiddleware = [
+  'Adonis/Middleware/BodyParser'
+]
 
 /*
 |--------------------------------------------------------------------------

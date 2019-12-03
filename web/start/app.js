@@ -13,7 +13,8 @@
 const providers = [
   '@adonisjs/framework/providers/AppProvider',
   '@adonisjs/lucid/providers/LucidProvider',
-  '@adonisjs/websocket/providers/WsProvider'
+  '@adonisjs/websocket/providers/WsProvider',
+  '@adonisjs/bodyparser/providers/BodyParserProvider'
 ]
 
 /*
@@ -26,6 +27,7 @@ const providers = [
 |
 */
 const aceProviders = [
+  '@adonisjs/lucid/providers/MigrationsProvider'
 ]
 
 /*

@@ -1,5 +1,6 @@
 'use strict'
 
+/** @type {typeof import('@adonisjs/websocket/src/Ws/index')} */
 const Ws = use('Ws')
 
 /*
@@ -30,6 +31,7 @@ const globalMiddleware = [
 | Ws.channel('chat', 'ChatController').middleware(['auth'])
 */
 const namedMiddleware = {
+  trustedSource: 'App/Middleware/TrustedSource'
 }
 
 Ws

@@ -8,7 +8,9 @@ class Client {
     this.socket = null
     this.socketUrl = socketUrl
     this.isDebug = isDebug
+
     this.events = new EventEmitter()
+    this.events.socket = this
 
     this.topic = topic
     this.packets = packets(this.topic)
@@ -21,6 +23,7 @@ class Client {
 
     this.timer = null
     this.socketSettings = {}
+
     this.mixer = null
     this.twitch = null
 

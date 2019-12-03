@@ -15,10 +15,13 @@ function startChat () {
 }
 
 function subscribeToChannel () {
-  const chat = ws.subscribe('chat:parsed')
+  const path = window.location.pathname.slice(1).split('/')
+  const platform = path[0].toLowerCase()
+  const channel = path[1].toLowerCase()
+  const chat = ws.subscribe(`chat:${platform}.${channel}`)
 
   chat.on('error', () => {
-    document.getElementById('connection').innerText = 'Connected to topic "chat".'
+    document.getElementById('connection').innerText = 'Connected to websocket, but erroring.'
   })
 
   chat.on('message', (message) => {

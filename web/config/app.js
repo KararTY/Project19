@@ -201,7 +201,7 @@ module.exports = {
     console: {
       driver: 'console',
       name: 'web-app',
-      level: 'info'
+      level: Env.get('LOGGER_LEVEL', 'info')
     },
 
     /*

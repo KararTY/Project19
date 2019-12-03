@@ -15,4 +15,5 @@
 
 const Ws = use('Ws')
 
-Ws.channel('chat:*', 'ChatUpdateController')
+Ws.channel('raw:*', 'RawChatController').middleware(['trustedSource'])
+Ws.channel('chat:*', 'ChatController')

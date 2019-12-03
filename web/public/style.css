@@ -10,6 +10,7 @@ body {
   font-weight: 300;
   background-image: url("/splash.png");
   background-color: #220052;
+  color: #BDB3CB;
 }
 
 * {
@@ -59,7 +60,6 @@ section:before {
 
 .subtitle {
   margin-top: 25px;
-  color: #BDB3CB;
   font-size: 17px;
   text-align: center;
   letter-spacing: 0.5;

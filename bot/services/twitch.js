@@ -16,20 +16,20 @@ async function initialize (events, testChannels, isDebug) {
     }
   })
 
-  client.on('close', error => {
-    if (error != null) {
-      console.error('Twitch: Client closed due to error', error)
+  client.on('close', err => {
+    if (err != null) {
+      console.error('Twitch: Client closed due to error', err)
     }
   })
 
   client.on('PRIVMSG', async msg => {
-    if (isDebug) console.log(`Twitch: [Twitch#${msg.channelName}] ${msg.displayName}: ${msg.messageText}`)
+    if (isDebug) console.log(`Twitch: #${msg.channelName} ${msg.displayName}: ${msg.messageText}`)
     if (websocketFullyOnline) events.emit('chat', { twitch: msg })
     else messages.push(msg)
   })
 
   events.on('socketJoinAck', (topic) => {
-    if (topic === 'chat:raw') {
+    if (topic === events.socket.topic) {
       websocketFullyOnline = true
       if (messages.length > 0) {
         events.emit('chat', { twitchOfflineBatch: messages })

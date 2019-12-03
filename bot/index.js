@@ -9,7 +9,7 @@ const testChannels = {
 const helper = require('./helpers/message')
 const Client = require('./services/socket')
 
-const client = new Client(`http://${process.env.HOST}:${process.env.PORT}/ws`, 'chat:raw', isDebug)
+const client = new Client(`http://${process.env.HOST}:${process.env.PORT}/ws`, 'raw:chat', isDebug)
 
 function sendChatPacket (event, data) {
   client.socket.send(client.packets.event(event, data), err => {
