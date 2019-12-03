@@ -3,7 +3,7 @@ const isDebug = process.env.NODE_ENV !== 'production'
 
 const testChannels = {
   twitch: ['notkarar', 'forsen', 'drdisrespect', 'xqcow', 'mizkif', 'pajlada', 'nymn'],
-  mixer: ['frozen-bags', 'shroud', 'ninja', 'KingGothalion']
+  mixer: ['frozen-bags', 'shroud', 'ninja', 'kinggothalion']
 }
 
 const helper = require('./helpers/message')
