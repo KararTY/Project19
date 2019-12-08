@@ -2,7 +2,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }
 const isDebug = process.env.NODE_ENV !== 'production'
 
 const testChannels = {
-  twitch: ['notkarar', 'forsen', 'drdisrespect', 'xqcow', 'mizkif', 'pajlada', 'nymn'],
+  twitch: ['notkarar', 'forsen', 'drdisrespect', 'xqcow', 'mizkif', 'pajlada', 'nymn', 'riotgames'],
   mixer: ['frozen-bags', 'shroud', 'ninja', 'kinggothalion']
 }
 

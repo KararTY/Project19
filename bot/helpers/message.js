@@ -1,4 +1,4 @@
-async function createLog ({ messages }) {
+async function createLog ({ message }) {
 
 }
 

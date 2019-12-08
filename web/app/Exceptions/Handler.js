@@ -30,17 +30,19 @@ class ExceptionHandler extends BaseExceptionHandler {
     if (!message) return super.handle(...arguments)
     else {
       return response.send(`
-      <html>
-        <head>
-          <link rel="stylesheet" href="/style.css" />
-        </head>
-        <body>
-          <section>
-          <h1>Error ${error.status}</h1>
-          <h3>Error ${message}</h3>
-          </section>
-        </body>
-      </html>
+        <html>
+          <head>
+            <link rel="stylesheet" text="text/css" href="/css/stylesheet.css" />
+          </head>
+          <body>
+            <section class="section">
+              <div class="container content">
+                <h1>Error ${error.status}</h1>
+                <h3>Error ${message}</h3>
+              </div>
+            </section>
+          </body>
+        </html>
       `)
     }
   }

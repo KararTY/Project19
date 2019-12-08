@@ -5,7 +5,9 @@
   "description": "Project19 web server.",
   "scripts": {
     "start": "cross-env ENV_PATH=\"../.env\" adonis serve",
-    "migration": "cross-env ENV_PATH=\"../.env\" node ace migration:run"
+    "adonis": "cross-env ENV_PATH=\"../.env\" adonis",
+    "migration": "cross-env ENV_PATH=\"../.env\" node ace migration:run",
+    "css-build": "node-sass resources/sass/mystyles.scss public/css/stylesheet.css --output-style compressed"
   },
   "keywords": [
     "project19",
@@ -26,5 +28,9 @@
   },
   "autoload": {
     "App": "./app"
+  },
+  "devDependencies": {
+    "bulma": "^0.8.0",
+    "node-sass": "^4.13.0"
   }
 }

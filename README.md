@@ -5,9 +5,12 @@ Chat bot with Web UI. Challenge for the holidays.
 Since the project is still a work in progress, all updates will most likely introduce breaking changes. This is not a production-ready project.
 
 ## Technologies
-  * AdonisJS
-  * dank-twitch-irc
-  * @mixer/client-node
+  * For the front-end:
+    * Back-end: AdonisJS, node-sass
+    * Front-end: lighterhtml, babel-polyfill, adonis-websocket-client
+  * For the bots:
+    * dank-twitch-irc
+    * @mixer/client-node
   * PostgreSQL
 
 ## Running it
@@ -28,6 +31,7 @@ Since the project is still a work in progress, all updates will most likely intr
   * `npm i`
   * `npm start`
   * If the `.env` settings are default, browse to http://localhost:3333/.
+
 ## Planned features
 ### High priority
   * Platform support:

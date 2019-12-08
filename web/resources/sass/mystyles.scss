@@ -1,0 +1,59 @@
+@charset "utf-8";
+/*! bulma.io v0.8.0 | MIT License | github.com/jgthms/bulma */
+@import "../../node_modules/bulma/sass/utilities/_all.sass";
+@import "../../node_modules/bulma/sass/base/_all.sass";
+@import "../../node_modules/bulma/sass/elements/_all.sass";
+@import "../../node_modules/bulma/sass/form/_all.sass";
+// @import "../../node_modules/bulma/sass/grid/_all.sass";
+
+// @import "../../node_modules/bulma/sass/layout/_all.sass";
+@import "../../node_modules/bulma/sass/layout/section.sass";
+
+// @import "../../node_modules/bulma/sass/components/_all.sass";
+@import "../../node_modules/bulma/sass/components/card.sass";
+
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+html {
+  font-family: 'Source Sans Pro', sans-serif;
+  background-image: url('/img/splash.png');
+  background-attachment: fixed;
+}
+
+.card {
+  background-image: url('/img/pyramid.png');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.loader-wrapper {
+  width: 0px;
+  animation: loader-fullView 0.5s forwards cubic-bezier(0.250, 0.460, 0.450, 0.940);
+}
+
+.loader-line {
+  height: 10px;
+  background: #777;
+  margin-top: 20px;
+}
+
+@keyframes loader-fullView {
+  100% {
+    width: 100%;
+  }
+}
+
+.loader-animate {
+  animation : loader-shimmer 2s infinite linear;
+  background: linear-gradient(to right, #eff1f3 4%, #e2e2e2 25%, #eff1f3 36%);
+   background-size: 1000px 100%;
+}
+
+@keyframes loader-shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
