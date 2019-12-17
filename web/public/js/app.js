@@ -11,14 +11,57 @@ async function getPath (fullPathArray) {
       if (!rendered) render(el, inputChat())
       break
     }
-    default:
+    default: {
+      const generalChart = document.getElementById('generalChart')
+      let chart
+      if (generalChart && window.Chart) {
+        window.Chart.platform.disableCSSInjection = true
+        chart = new window.Chart(generalChart.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: [{
+              label: '# of Votes',
+              data: [12, 19, 3, 5, 2, 3],
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+              ],
+              borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true
+                }
+              }]
+            }
+          }
+        })
+      }
       break
+    }
   }
   return `Done loading "${fullPathArray.join('/')}".`
 }
 
 function inputChat () {
-  async function onclick () {
+  async function onsubmit ($ev) {
+    $ev.preventDefault()
     const form = document.forms.liveChatSearch
     const inputtedChannelNameElement = form.elements.channelName
     const inputtedChannelNameValue = inputtedChannelNameElement.value
@@ -52,7 +95,7 @@ function inputChat () {
 
   return html`
     <h1>Live chat</h1>
-    <form name="liveChatSearch">
+    <form name="liveChatSearch" onsubmit=${onsubmit}>
       <div class="field has-addons">
         <div class="control">
           <span class="select">
@@ -66,7 +109,7 @@ function inputChat () {
           <input class="input" type="text" name="channelName" placeholder="Channel name...">
         </div>
         <div class="control">
-          <a class="button" onclick=${onclick}>Search</a>
+          <button class="button" type="submit">Search</button>
         </div>
       </div>
     </form>
@@ -81,7 +124,7 @@ async function liveChat (el, platform, channel) {
         <div id="chat" class="loader-line loader-animate"></div>
       </div>
     `)
-    await startChat(platform, channel)
+    await window.startChat(platform, channel)
     document.getElementById('siteloading').classList.remove('loader-wrapper')
     document.getElementById('connection').classList.remove('loader-line', 'loader-animate')
     document.getElementById('chat').classList.remove('loader-line', 'loader-animate')

@@ -1,31 +1,62 @@
 @charset "utf-8";
-/*! bulma.io v0.8.0 | MIT License | github.com/jgthms/bulma */
-@import "../../node_modules/bulma/sass/utilities/_all.sass";
-@import "../../node_modules/bulma/sass/base/_all.sass";
-@import "../../node_modules/bulma/sass/elements/_all.sass";
-@import "../../node_modules/bulma/sass/form/_all.sass";
-// @import "../../node_modules/bulma/sass/grid/_all.sass";
 
-// @import "../../node_modules/bulma/sass/layout/_all.sass";
-@import "../../node_modules/bulma/sass/layout/section.sass";
-
-// @import "../../node_modules/bulma/sass/components/_all.sass";
-@import "../../node_modules/bulma/sass/components/card.sass";
-
+// Source Sans Pro
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
 
+// Brand colors
+$malachite: #0CCA4A;
+$northTexasGreen: #099336;
+$onyx: #3C3744;
+$gunMetal: #292F36;
+$smokyBlack: #0A0908;
+$quartz: #4D4955;
+$whiteSmoke: #F6F7F7;
+$platinum: #E0E1E1;
+
+// Global variables override
+$family-sans-serif: 'Source Sans Pro', sans-serif;
+$grey-dark: $gunMetal;
+$grey-darker: $smokyBlack;
+$grey-light: $onyx;
+$grey-lighter: $quartz;
+$primary: $malachite;
+$text: $platinum;
+$text-strong: $whiteSmoke;
+
+/* Components override */
+$dark: $onyx;
+$link: $primary;
+$link-hover: $northTexasGreen;
+$link-hover-border: $malachite;
+
+// General
+$body-background-color: $grey-darker;
+
+// Button
+$button-background-color: $onyx;
+
+// Card component override
+$card-background-color: $grey-dark;
+
+// Form overrides
+$input-background-color: $whiteSmoke;
+$input-icon-color: rgba($onyx, 0.5);
+$input-icon-active-color: rgba($grey-darker, 0.5);
+$input-color: $gunMetal;
+$input-placeholder-color: rgba($onyx, 0.5);
+
 html {
-  font-family: 'Source Sans Pro', sans-serif;
   background-image: url('/img/splash.png');
   background-attachment: fixed;
 }
 
 .card {
-  background-image: url('/img/pyramid.png');
-  background-repeat: no-repeat;
-  background-position: center;
+  .card {
+    background-color: $onyx;
+  }
 }
 
+// Loader
 .loader-wrapper {
   width: 0px;
   animation: loader-fullView 0.5s forwards cubic-bezier(0.250, 0.460, 0.450, 0.940);
@@ -45,8 +76,8 @@ html {
 
 .loader-animate {
   animation : loader-shimmer 2s infinite linear;
-  background: linear-gradient(to right, #eff1f3 4%, #e2e2e2 25%, #eff1f3 36%);
-   background-size: 1000px 100%;
+  background: linear-gradient(to right, rgba(239, 241, 243, 0.3) 4%, rgba(226, 226, 226, 0.5) 25%, rgba(239, 241, 243, 0.5) 36%);
+  background-size: 1000px 100%;
 }
 
 @keyframes loader-shimmer {
@@ -57,3 +88,24 @@ html {
     background-position: 1000px 0;
   }
 }
+
+/*! bulma.io v0.8.0 | MIT License | github.com/jgthms/bulma */
+@import "../../node_modules/bulma/sass/utilities/_all.sass";
+@import "../../node_modules/bulma/sass/base/_all.sass";
+@import "../../node_modules/bulma/sass/elements/_all.sass";
+@import "../../node_modules/bulma/sass/form/_all.sass";
+@import "../../node_modules/bulma/sass/grid/columns.sass";
+// @import "../../node_modules/bulma/sass/grid/_all.sass"
+
+// @import "../../node_modules/bulma/sass/layout/_all.sass";
+@import "../../node_modules/bulma/sass/layout/section.sass";
+@import "../../node_modules/bulma/sass/layout/hero.sass";
+
+// @import "../../node_modules/bulma/sass/components/_all.sass";
+@import "../../node_modules/bulma/sass/components/card.sass";
+@import "../../node_modules/bulma/sass/components/tabs.sass";
+
+/*! Chartjs.min.css | v2.9.3 */
+@keyframes chartjs-render-animation{from{opacity:.99}to{opacity:1}}.chartjs-render-monitor{animation:chartjs-render-animation 1ms}
+.chartjs-size-monitor,.chartjs-size-monitor-expand,.chartjs-size-monitor-shrink{position:absolute;direction:ltr;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1}
+.chartjs-size-monitor-expand>div{position:absolute;width:1000000px;height:1000000px;left:0;top:0}.chartjs-size-monitor-shrink>div{position:absolute;width:200%;height:200%;left:0;top:0}

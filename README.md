@@ -1,7 +1,7 @@
 # Project19
 Chat bot with Web UI. Challenge for the holidays.
 
-## WORK IN PROGRESS v0.1.0
+## WORK IN PROGRESS v0.1.2
 Since the project is still a work in progress, all updates will most likely introduce breaking changes. This is not a production-ready project.
 
 ## Technologies

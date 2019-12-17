@@ -1,29 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" text="text/css" href="/css/stylesheet.css" />
-  <title>{{ web.title }}</title>
-</head>
-<body>
-  <section class="section">
-    <div class="container content">
-      <div class="card">
-        <div class="card-content content">
-          <h1>Welcome to Project19, loading...</h1>
-          <div id="siteloading" class="loader-wrapper">
-            <p class="loader-line loader-animate"></p>
-          </div>
-        </div>
+<section class="section">
+  <div class="container">
+    <section class="hero is-dark">
+      <div class="hero-body">
+        <h1 class="title">Project19</h1>
+        <h2 class="subtitle">Welcome to project19-web.</h2>
       </div>
-    </div>
-  </section>
-</body>
-{{ script('/js/babel-polyfill.min@6.26.0.js') }}
-{{ script('/js/Ws.browser.min@1.0.9.js') }}
-{{ script('/js/lighterhtml.min@2.0.7.js') }}
-{{ script('/js/socket.js') }}
-{{ script('/js/app.js') }}
-</html>
+      <div class="hero-foot">
+        <nav class="tabs is-boxed is-medium is-centered">
+          <div class="container">
+            <ul>
+              <li><a>Live chat</a></li>
+              <li><a>Logs</a></li>
+              <li><a>Clips</a></li>
+              <li><a>Login</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </section>
+    <br>
+    @include('partials.login')
+    <br>
+    @include('partials.top')
+  </div>
+</section>

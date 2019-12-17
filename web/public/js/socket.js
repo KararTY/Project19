@@ -16,7 +16,7 @@ async function startChat (platform, channel) {
 }
 
 async function subscribeToChannel (platform, channel) {
-  const chat = ws.subscribe(`chat:${platform}.${channel}`)
+  const chat = ws.subscribe(`chat:${platform.toLowerCase()}.${channel.toLowerCase()}`)
 
   chat.on('ready', () => {
     for (let index = 0; index < 15; index++) {
