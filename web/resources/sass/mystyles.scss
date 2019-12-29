@@ -13,7 +13,7 @@ $quartz: #4D4955;
 $whiteSmoke: #F6F7F7;
 $platinum: #E0E1E1;
 
-// Global variables override
+// Global variables overwrite
 $family-sans-serif: 'Source Sans Pro', sans-serif;
 $grey-dark: $gunMetal;
 $grey-darker: $smokyBlack;
@@ -23,8 +23,8 @@ $primary: $malachite;
 $text: $platinum;
 $text-strong: $whiteSmoke;
 
-/* Components override */
-$dark: $onyx;
+/* Components overwrite */
+$dark: $grey-light;
 $link: $primary;
 $link-hover: $northTexasGreen;
 $link-hover-border: $malachite;
@@ -33,17 +33,22 @@ $link-hover-border: $malachite;
 $body-background-color: $grey-darker;
 
 // Button
-$button-background-color: $onyx;
+$button-background-color: $grey-light;
 
-// Card component override
+// Card component
 $card-background-color: $grey-dark;
 
-// Form overrides
+// Form
 $input-background-color: $whiteSmoke;
-$input-icon-color: rgba($onyx, 0.5);
+$input-icon-color: rgba($grey-light, 0.5);
 $input-icon-active-color: rgba($grey-darker, 0.5);
-$input-color: $gunMetal;
-$input-placeholder-color: rgba($onyx, 0.5);
+$input-color: $grey-dark;
+$input-placeholder-color: rgba($grey-light, 0.5);
+
+// Tabs
+$tabs-boxed-link-active-background-color: $primary !important;
+$tabs-boxed-link-active-border-color: rgba($grey-light, 0.5) !important;
+$tabs-link-active-color: $text-strong !important;
 
 html {
   background-image: url('/img/splash.png');
@@ -89,6 +94,9 @@ html {
   }
 }
 
+// Custom
+@import "./custom/chat.scss";
+
 /*! bulma.io v0.8.0 | MIT License | github.com/jgthms/bulma */
 @import "../../node_modules/bulma/sass/utilities/_all.sass";
 @import "../../node_modules/bulma/sass/base/_all.sass";
@@ -104,6 +112,11 @@ html {
 // @import "../../node_modules/bulma/sass/components/_all.sass";
 @import "../../node_modules/bulma/sass/components/card.sass";
 @import "../../node_modules/bulma/sass/components/tabs.sass";
+
+// Overrides
+.select:not(.is-multiple):not(.is-loading):hover::after {
+  border-color: $onyx;
+}
 
 /*! Chartjs.min.css | v2.9.3 */
 @keyframes chartjs-render-animation{from{opacity:.99}to{opacity:1}}.chartjs-render-monitor{animation:chartjs-render-animation 1ms}

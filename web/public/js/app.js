@@ -121,7 +121,7 @@ async function liveChat (el, platform, channel) {
     render(el, html`
       <div id="siteloading" class="loader-wrapper">
         <div id="connection" class="loader-line loader-animate"></div>
-        <div id="chat" class="loader-line loader-animate"></div>
+        <div id="chat" class="chat loader-line loader-animate"></div>
       </div>
     `)
     await window.startChat(platform, channel)

@@ -1,0 +1,10 @@
+.chat {
+  width: 34rem;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.chat-message {
+  padding: .5rem 2rem;
+  word-wrap: break-word;
+}

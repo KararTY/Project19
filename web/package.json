@@ -7,7 +7,8 @@
     "start": "cross-env ENV_PATH=\"../.env\" adonis serve",
     "adonis": "cross-env ENV_PATH=\"../.env\" adonis",
     "migration": "cross-env ENV_PATH=\"../.env\" node ace migration:run",
-    "css-build": "node-sass resources/sass/mystyles.scss public/css/stylesheet.css --output-style compressed"
+    "css-build": "node-sass resources/sass/mystyles.scss public/css/stylesheet.css --output-style compressed",
+    "css-build-plain": "node-sass resources/sass/plain.scss public/css/stylesheet-plain.css --output-style compressed"
   },
   "keywords": [
     "project19",

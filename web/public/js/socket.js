@@ -1,6 +1,7 @@
 /* global adonis */
 let ws = null
 
+// eslint-disable-next-line no-unused-vars
 async function startChat (platform, channel) {
   ws = adonis.Ws(null, { path: 'ws' }).connect()
 
@@ -19,11 +20,6 @@ async function subscribeToChannel (platform, channel) {
   const chat = ws.subscribe(`chat:${platform.toLowerCase()}.${channel.toLowerCase()}`)
 
   chat.on('ready', () => {
-    for (let index = 0; index < 15; index++) {
-      const div = document.createElement('div')
-      div.innerHTML = '<br>'
-      document.getElementById('chat').appendChild(div)
-    }
     return Promise.resolve()
   })
 
@@ -36,6 +32,7 @@ async function subscribeToChannel (platform, channel) {
 
     const div = document.createElement('div')
     div.innerText = message
+    div.classList.add('chat-message')
     document.getElementById('chat').appendChild(div)
 
     if (lines >= 15) document.getElementById('chat').removeChild(document.getElementById('chat').firstChild)

@@ -12,4 +12,9 @@ hooks.after.providersBooted(async () => {
   View.global('icon', (iconName, size = { width: 16, height: 16 }) => {
     return feather.icons[iconName].toSvg(size)
   })
+
+  View.global('isActive', (variable, compareTo) => {
+    if (variable === compareTo) return 'is-active'
+    else return ''
+  })
 })

@@ -43,7 +43,7 @@ class ExceptionHandler extends BaseExceptionHandler {
             </section>
           </body>
         </html>
-      `)
+      `.replace(/\s\s/g, ''))
     }
   }
 

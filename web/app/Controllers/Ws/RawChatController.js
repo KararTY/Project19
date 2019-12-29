@@ -3,6 +3,8 @@
 const Ws = use('Ws')
 const Logger = use('Logger')
 
+const Twitch = use('Service/Twitch')
+
 class RawChatController {
   constructor ({ socket, request }) {
     this.socket = socket
@@ -11,7 +13,7 @@ class RawChatController {
     // Logger.debug('%j', { socket, request })
   }
 
-  onMessage ({ twitch, twitchOfflineBatch, mixer, mixerOfflineBatch }) {
+  async onMessage ({ twitch, twitchOfflineBatch, mixer, mixerOfflineBatch }) {
     const platform = twitch ? 'twitch' : mixer ? 'mixer' : false
     if (platform) {
       let topicString = 'chat:'
@@ -19,7 +21,7 @@ class RawChatController {
 
       if (twitch) {
         topicString += `${platform}.${twitch.channelName}`
-        message = `#${twitch.channelName} ${twitch.displayName}: ${twitch.messageText}`
+        message = await Twitch.parse(twitch)
       } else if (mixer) {
         topicString += `${platform}.${mixer.token}`
         message = `#${mixer.token} ${mixer.user_name}: ${mixer.message.message.map(message => message.text).join('')}`
@@ -28,7 +30,7 @@ class RawChatController {
       Logger.debug(`[RawChatController] <${platform.toUpperCase()}> message received: ${message}`)
       const channel = Ws.getChannel('chat:*').topic(topicString)
       if (channel) channel.broadcast('message', message)
-    } else if (twitchOfflineBatch) Logger.debug(`Mixer messages batch received: ${twitchOfflineBatch.length}`)
+    } else if (twitchOfflineBatch) Logger.debug(`Twitch messages batch received: ${twitchOfflineBatch.length}`)
     // message.twitchOfflineBatch.map(message => message.messageText).join('| ')
 
     else if (mixerOfflineBatch) Logger.debug(`Mixer messages batch received: ${mixerOfflineBatch.length}`)

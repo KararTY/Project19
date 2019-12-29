@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{{ web.title }}</title>
+  <link rel="stylesheet" type="text/css" href="/css/stylesheet-plain.css">
+</head>
+<body>
+  <div id="siteloading">
+    <div id="connection" class="is-hidden"></div>
+    <div id="chat" class="chat"></div>
+  </div>
+</body>
+{{ script('/js/babel-polyfill.min@6.26.0.js') }}
+{{ script('/js/Ws.browser.min@1.0.9.js') }}
+{{ script('/js/socket.js') }}
+{{ script('/js/live-plain.js') }}
+</html>
