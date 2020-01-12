@@ -1,0 +1,25 @@
+<div class="card">
+  @if($slot.header)
+    <div class="card-header">
+      @!yield($slot.header)
+    </div>
+  @endif
+  @if($slot.image)
+    <div class="card-image">
+      @!yield($slot.image)
+    </div>
+  @endif
+  @if($slot.content)
+    <div class="card-content">
+      @!yield($slot.content)
+    </div>
+  @endif
+  @if($slot.footer)
+    <div class="card-footer">
+      @!yield($slot.footer)
+    </div>
+  @endif
+  @if($slot.main)
+    @!yield($slot.main)
+  @endif
+</div>

@@ -18,7 +18,8 @@ const providers = [
   '@adonisjs/websocket/providers/WsProvider',
   '@adonisjs/bodyparser/providers/BodyParserProvider',
   '@adonisjs/framework/providers/ViewProvider',
-  path.join(__dirname, '..', 'providers', 'TwitchProvider')
+  path.join(__dirname, '..', 'providers', 'TwitchProvider'),
+  path.join(__dirname, '..', 'providers', 'MixerProvider')
 ]
 
 /*

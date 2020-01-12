@@ -1,3 +1,5 @@
+'use strict'
+
 // Helper for Adonis websocket packets.
 
 // https://github.com/adonisjs/adonis-websocket-packet

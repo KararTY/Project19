@@ -1,6 +1,6 @@
 'use strict'
 
-class ChatUpdateController {
+class StreamEventController {
   constructor ({ socket, request }) {
     this.socket = socket
     this.request = request
@@ -19,4 +19,4 @@ class ChatUpdateController {
   }
 }
 
-module.exports = ChatUpdateController
+module.exports = StreamEventController

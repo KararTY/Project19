@@ -3,7 +3,7 @@
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
-class User extends Model {
+class StreamEvent extends Model {
   static get primaryKey () {
     return 'id'
   }
@@ -23,17 +23,9 @@ class User extends Model {
     return userid.slice(2)
   }
 
-  /**
-   * Sends off stringified JSON to database.
-   * @param {Array} json
-   */
-  setChannels (json) {
-    return JSON.stringify(json)
-  }
-
   static get incrementing () {
     return false
   }
 }
 
-module.exports = User
+module.exports = StreamEvent

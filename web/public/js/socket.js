@@ -33,8 +33,8 @@ async function subscribeToChannel (platform, channel) {
     const div = document.createElement('div')
     div.innerText = message
     div.classList.add('chat-message')
-    document.getElementById('chat').appendChild(div)
+    document.getElementById('chat').prepend(div)
 
-    if (lines >= 15) document.getElementById('chat').removeChild(document.getElementById('chat').firstChild)
+    if (lines >= 20) document.getElementById('chat').removeChild(document.getElementById('chat').lastChild)
   })
 }

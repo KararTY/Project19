@@ -4,6 +4,7 @@ const Ws = use('Ws')
 const Logger = use('Logger')
 
 const Twitch = use('Service/Twitch')
+const Mixer = use('Service/Mixer')
 
 class RawChatController {
   constructor ({ socket, request }) {
@@ -14,27 +15,48 @@ class RawChatController {
   }
 
   async onMessage ({ twitch, twitchOfflineBatch, mixer, mixerOfflineBatch }) {
-    const platform = twitch ? 'twitch' : mixer ? 'mixer' : false
-    if (platform) {
-      let topicString = 'chat:'
-      let message
+    const platformName = (twitch || twitchOfflineBatch) ? 'twitch' : (mixer || mixerOfflineBatch) ? 'mixer' : false
 
-      if (twitch) {
-        topicString += `${platform}.${twitch.channelName}`
-        message = await Twitch.parse(twitch)
-      } else if (mixer) {
-        topicString += `${platform}.${mixer.token}`
-        message = `#${mixer.token} ${mixer.user_name}: ${mixer.message.message.map(message => message.text).join('')}`
+    if (twitch || mixer) {
+      const topicString = `chat:${platformName}.${twitch ? twitch.channelName : mixer.token}`
+      const PlatformMessage = twitch ? Twitch : mixer ? Mixer : false
+      const messageObject = twitch || mixer
+
+      try {
+        const json = await PlatformMessage.parseMessage(messageObject)
+        const message = PlatformMessage.displayMessage(json)
+
+        if (!json.blacklisted) {
+          Logger.debug(`[RawChatController] <${platformName.toUpperCase()}> message received: ${message}`)
+          const channel = Ws.getChannel('chat:*').topic(topicString)
+          if (channel) channel.broadcast('message', message)
+        }
+
+        // TODO: SEND TO LOGGER
+      } catch (err) {
+        console.error(err)
+        Logger.debug('Error', err)
       }
+    } else if (twitchOfflineBatch || mixerOfflineBatch) {
+      const PlatformMessage = twitchOfflineBatch ? Twitch : mixerOfflineBatch ? Mixer : false
+      const array = twitchOfflineBatch || mixerOfflineBatch
 
-      Logger.debug(`[RawChatController] <${platform.toUpperCase()}> message received: ${message}`)
-      const channel = Ws.getChannel('chat:*').topic(topicString)
-      if (channel) channel.broadcast('message', message)
-    } else if (twitchOfflineBatch) Logger.debug(`Twitch messages batch received: ${twitchOfflineBatch.length}`)
-    // message.twitchOfflineBatch.map(message => message.messageText).join('| ')
+      Logger.debug(`[RawChatController] ${platformName.toUpperCase()} messages batch received: ${array.length}`)
 
-    else if (mixerOfflineBatch) Logger.debug(`Mixer messages batch received: ${mixerOfflineBatch.length}`)
-    // message.mixerOfflineBatch.map(mixer => mixer.message.message.map(message => message.text).join('')).join('| ')
+      for (let index = 0; index < array.length; index++) {
+        try {
+          const json = await PlatformMessage.parseMessage(array[index])
+          const message = PlatformMessage.displayMessage(json)
+
+          if (!json.blacklisted) Logger.debug(`[RawChatController] <${platformName.toUpperCase()}> offline message received: ${message}`)
+
+          // TODO: SEND TO LOGGER
+        } catch (err) {
+          console.error(err)
+          Logger.debug('Error', err)
+        }
+      }
+    }
 
     // same as: socket.on('message')
   }

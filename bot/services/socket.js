@@ -1,3 +1,5 @@
+'use strict'
+
 const WS = require('ws')
 const { EventEmitter } = require('events')
 

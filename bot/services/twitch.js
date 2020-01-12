@@ -1,9 +1,13 @@
+'use strict'
+
 const { ChatClient } = require('dank-twitch-irc')
 const client = new ChatClient({ username: process.env.TWITCH_BOT_USERNAME, password: process.env.TWITCH_CHAT_TOKEN })
 
-async function initialize (events, testChannels, isDebug) {
-  let websocketFullyOnline = false
+async function initialize ({ messageClient, eventClient }, testChannels, isDebug) {
+  let messageWebsocketFullyOnline = false
+  let eventWebsocketFullyOnline = false
   let messages = []
+  let events = []
 
   client.on('ready', async () => {
     if (isDebug) console.log('Twitch: Successfully connected to Twitch IRC.')
@@ -24,27 +28,52 @@ async function initialize (events, testChannels, isDebug) {
 
   client.on('PRIVMSG', async msg => {
     if (isDebug) console.log(`Twitch: #${msg.channelName} ${msg.displayName}: ${msg.messageText}`)
-    if (websocketFullyOnline) events.emit('chat', { twitch: msg })
+    if (messageWebsocketFullyOnline) messageClient.emit('chat', { twitch: msg })
     else messages.push(msg)
   })
 
-  events.on('socketJoinAck', (topic) => {
-    if (topic === events.socket.topic) {
-      websocketFullyOnline = true
+  client.on('USERNOTICE', async event => {
+    if (isDebug) console.log(`Twitch: #${event.channelName} ${event.displayName}: ${event.messageText}`)
+    if (eventWebsocketFullyOnline) eventClient.emit('event', { twitch: event })
+    else events.push(event)
+  })
+
+  messageClient.on('socketJoinAck', topic => {
+    if (topic === messageClient.socket.topic) {
+      messageWebsocketFullyOnline = true
       if (messages.length > 0) {
-        events.emit('chat', { twitchOfflineBatch: messages })
+        messageClient.emit('chat', { twitchOfflineBatch: messages })
         messages = []
       }
     }
   })
 
-  events.on('socketOffline', () => {
-    websocketFullyOnline = false
+  eventClient.on('socketJoinAck', topic => {
+    if (topic === eventClient.socket.topic) {
+      eventWebsocketFullyOnline = true
+      if (events.length > 0) {
+        eventClient.emit('event', { twitchOfflineBatch: messages })
+        events = []
+      }
+    }
   })
 
-  events.on('keepTwitchMessage', (data) => {
+  messageClient.on('socketOffline', () => {
+    messageWebsocketFullyOnline = false
+  })
+
+  eventClient.on('socketOffline', () => {
+    eventWebsocketFullyOnline = false
+  })
+
+  messageClient.on('keepTwitchMessage', data => {
     if (data.twitch) messages.push(data.twitch)
     else if (data.twitchOfflineBatch) messages.push(...data.twitchOfflineBatch)
+  })
+
+  eventClient.on('keepTwitchEvent', data => {
+    if (data.twitch) events.push(data.twitch)
+    else if (data.twitchOfflineBatch) events.push(...data.twitchOfflineBatch)
   })
 
   client.connect()

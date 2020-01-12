@@ -5,55 +5,49 @@
     </div>
     <div class="columns is-mobile">
       <div class="column">
-        <div class="card">
-          <div class="card-header">
-            <p class="card-header-title has-text-centered">
-              Streamer 1
-            </p>
-          </div>
-          <div class="card-image">
+        @component('components.card')
+          @slot('header')
+            <p class="card-header-title has-text-centered">Streamer 1</p>
+          @endslot
+          @slot('image')
             <figure class="image">
               <img src="https://via.placeholder.com/1920x1080" alt="">
             </figure>
-          </div>
-        </div>
+          @endslot
+        @endcomponent
       </div>
       <div class="column">
-        <div class="card">
-          <div class="card-header">
-            <p class="card-header-title has-text-centered">
-              Streamer 2
-            </p>
-          </div>
-          <div class="card-image">
+        @component('components.card')
+          @slot('header')
+            <p class="card-header-title has-text-centered">Streamer 2</p>
+          @endslot
+          @slot('image')
             <figure class="image">
               <img src="https://via.placeholder.com/1920x1080" alt="">
             </figure>
-          </div>
-        </div>
+          @endslot
+        @endcomponent
       </div>
       <div class="column">
-        <div class="card">
-          <div class="card-header">
-            <p class="card-header-title has-text-centered">
-              Streamer 3
-            </p>
-          </div>
-          <div class="card-image">
+        @component('components.card')
+          @slot('header')
+            <p class="card-header-title has-text-centered">Streamer 3</p>
+          @endslot
+          @slot('image')
             <figure class="image">
               <img src="https://via.placeholder.com/1920x1080" alt="">
             </figure>
-          </div>
-        </div>
+          @endslot
+        @endcomponent
       </div>
     </div>
     <div class="columns">
       <div class="column">
-        <div class="card">
-          <div class="card-content">
-            <canvas id="generalChart"></canvas>
-          </div>
-        </div>
+        @component('components.card')
+          @slot('content')
+            @!component('components.chart', id = 'top-three')
+          @endslot
+        @endcomponent
       </div>
     </div>
   </div>
