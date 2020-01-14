@@ -5,6 +5,7 @@ const Logger = use('Logger')
 
 const Twitch = use('Service/Twitch')
 const Mixer = use('Service/Mixer')
+const Logs = use('Service/Logs')
 
 class RawStreamEventController {
   constructor ({ socket, request }) {
@@ -15,38 +16,39 @@ class RawStreamEventController {
   }
 
   async onMessage ({ twitch, twitchOfflineBatch, mixer, mixerOfflineBatch }) {
-    const platformName = twitch ? 'twitch' : mixer ? 'mixer' : false
+    const platformName = (twitch || twitchOfflineBatch) ? 'twitch' : (mixer || mixerOfflineBatch) ? 'mixer' : false
 
-    // if (twitch || mixer) {
-    //  const topicString = `streamevent:${platformName}.${twitch ? twitch.channelName : mixer.token}`
-    //  const PlatformEvent = twitch ? Twitch : mixer ? Mixer : false
-    //  const eventObject = twitch || mixer
-    //
-    //  /**
-    //   * Event {
-    //   *  name: string, len 32
-    //   *  value: string, len 64
-    //   * }
-    //   */
-    //  try {
-    //    Logger.debug(`[RawStreamEventController] event received: ${message}`)
-    //  } catch (err) {
-    //    console.error(err)
-    //    Logger.debug('Error', err)
-    //  }
-    // } else if (twitchOfflineBatch || mixerOfflineBatch) {
-    //  const PlatformEvent = twitchOfflineBatch ? Twitch : mixerOfflineBatch ? Mixer : false
-    //  const array = twitchOfflineBatch || mixerOfflineBatch
-    //
-    //  Logger.debug(`[RawStreamEventController] ${platformName.toUpperCase()} events batch received: ${array.length}`)
-    //
-    //  try {
-    //
-    //  } catch (err) {
-    //    console.error(err)
-    //    Logger.debug('Error', err)
-    //  }
-    // }
+    if (twitch || mixer) {
+      const topicString = `streamevent:${platformName}.${twitch ? twitch.channelName : mixer.token}`
+      const PlatformEvent = twitch ? Twitch : mixer ? Mixer : false
+      const eventObject = twitch || mixer
+
+      /**
+       * Event {
+       *  name: string, len 32
+       *  value: string, len 64
+       * }
+       */
+
+      try {
+        // Logger.debug(`[RawStreamEventController] event received: ${message}`)
+      } catch (err) {
+        console.error(err)
+        Logger.debug('Error', err)
+      }
+    } else if (twitchOfflineBatch || mixerOfflineBatch) {
+      const PlatformEvent = twitchOfflineBatch ? Twitch : mixerOfflineBatch ? Mixer : false
+      const array = twitchOfflineBatch || mixerOfflineBatch
+
+      Logger.debug(`[RawStreamEventController] ${platformName.toUpperCase()} events batch received: ${array.length}`)
+
+      try {
+
+      } catch (err) {
+        console.error(err)
+        Logger.debug('Error', err)
+      }
+    }
   }
 
   onClose (close) {

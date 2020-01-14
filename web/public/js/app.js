@@ -78,7 +78,7 @@ function inputChat () {
       inputtedChannelNameElement.parentElement.appendChild(html.node`
         <p id="${errorPath}" class="help is-danger">${errorMessage}</p>
       `)
-    } else {
+    } else if (!errorMessage) {
       await liveChat(document.querySelector('.card-content.content'), selectedPlatformValue || 'twitch', inputtedChannelNameValue)
       const newUrl = new URL(window.location)
       const fullPath = newUrl.pathname.slice(1).split('/')

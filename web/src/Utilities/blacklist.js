@@ -1,5 +1,6 @@
 'use strict'
 
+// TODO: Pajlada's api check?
 const fetch = require('node-fetch')
 
 async function blacklist (message) {

@@ -54,7 +54,7 @@ class Mixer {
 
   displayMessage (parsedMessage) {
     const levels = typeof parsedMessage.author.level === 'number' && typeof parsedMessage.author.ascensionLevel === 'number'
-    return `${levels ? `[LVL ${parsedMessage.author.level}] ` : ''}${parsedMessage.author.name}${levels ? ` [${parsedMessage.author.ascensionLevel}]` : ''}: ${parsedMessage.message}`
+    return `[${parsedMessage.timestamp.format('hh:mm')}] ${levels ? `[LVL ${parsedMessage.author.level}] ` : ''}${parsedMessage.author.name}${levels ? ` [${parsedMessage.author.ascensionLevel}]` : ''}: ${parsedMessage.message}`
   }
 
   async parseEvent (json) {

@@ -15,13 +15,19 @@ const messageClient = new Client(`http://${process.env.HOST}:${process.env.PORT}
 const eventClient = new Client(`http://${process.env.HOST}:${process.env.PORT}/ws`, 'rawstreamevent:all', isDebug)
 
 function sendChatPacket (client, event, data) {
-  client.socket.send(client.packets.event(event, data), err => {
-    if (err) {
-      client.counts.errors++
-      client.events.emit('socketError', err)
-      client.events.emit(`keep${(data.twitch || data.twitchOfflineBatch) ? 'Twitch' : 'Mixer'}Message`, data)
-    }
-  })
+  if (client.socket.readyState !== 0) {
+    client.socket.send(client.packets.event(event, data), err => {
+      if (err) {
+        client.counts.errors++
+        client.events.emit('socketError', err)
+        client.events.emit(`keep${(data.twitch || data.twitchOfflineBatch) ? 'Twitch' : 'Mixer'}Data`, data)
+      }
+    })
+  } else {
+    client.counts.errors++
+    client.events.emit('socketError', new Error('readyState 0'))
+    client.events.emit(`keep${(data.twitch || data.twitchOfflineBatch) ? 'Twitch' : 'Mixer'}Data`, data)
+  }
 }
 
 messageClient.events.on('chat', data => {
@@ -96,3 +102,4 @@ require('./services/twitch')({ messageClient: messageClient.events, eventClient:
 require('./services/mixer')({ messageClient: messageClient.events, eventClient: eventClient.events }, testChannels.mixer, isDebug)
 
 messageClient.start()
+eventClient.start()

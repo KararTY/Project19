@@ -5,6 +5,7 @@
   "description": "Project19 web server.",
   "scripts": {
     "start": "cross-env ENV_PATH=\"../.env\" adonis serve",
+    "nodemon": "cross-env ENV_PATH=\"../.env\" nodemon",
     "adonis": "cross-env ENV_PATH=\"../.env\" adonis",
     "migration": "cross-env ENV_PATH=\"../.env\" node ace migration:run",
     "css-build": "node-sass resources/sass/mystyles.scss public/css/stylesheet.css --output-style compressed",

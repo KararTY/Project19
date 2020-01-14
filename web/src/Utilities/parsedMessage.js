@@ -1,5 +1,7 @@
 'use strict'
 
+const moment = require('moment')
+
 class ParsedMessage {
   constructor (platform) {
     this.platform = platform || ''
@@ -23,7 +25,7 @@ class ParsedMessage {
 
     this.emotes = []
 
-    this.timestamp = new Date()
+    this.timestamp = moment().utc()
 
     this.color = {
       r: '',

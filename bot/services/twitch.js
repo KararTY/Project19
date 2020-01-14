@@ -26,14 +26,14 @@ async function initialize ({ messageClient, eventClient }, testChannels, isDebug
     }
   })
 
-  client.on('PRIVMSG', async msg => {
+  client.on('PRIVMSG', msg => {
     if (isDebug) console.log(`Twitch: #${msg.channelName} ${msg.displayName}: ${msg.messageText}`)
     if (messageWebsocketFullyOnline) messageClient.emit('chat', { twitch: msg })
     else messages.push(msg)
   })
 
-  client.on('USERNOTICE', async event => {
-    if (isDebug) console.log(`Twitch: #${event.channelName} ${event.displayName}: ${event.messageText}`)
+  client.on('USERNOTICE', event => {
+    if (isDebug) console.log(`Twitch Event: #${event.channelName} ${event.displayName}: ${event.systemMessage}`)
     if (eventWebsocketFullyOnline) eventClient.emit('event', { twitch: event })
     else events.push(event)
   })
@@ -66,12 +66,12 @@ async function initialize ({ messageClient, eventClient }, testChannels, isDebug
     eventWebsocketFullyOnline = false
   })
 
-  messageClient.on('keepTwitchMessage', data => {
+  messageClient.on('keepTwitchData', data => {
     if (data.twitch) messages.push(data.twitch)
     else if (data.twitchOfflineBatch) messages.push(...data.twitchOfflineBatch)
   })
 
-  eventClient.on('keepTwitchEvent', data => {
+  eventClient.on('keepTwitchData', data => {
     if (data.twitch) events.push(data.twitch)
     else if (data.twitchOfflineBatch) events.push(...data.twitchOfflineBatch)
   })

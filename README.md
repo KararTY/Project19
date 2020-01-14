@@ -37,12 +37,20 @@ Since the project is still a work in progress, all updates will most likely intr
   * Platform support:
     * Twitch.
     * Mixer.
-  * Points system (Maybe streaming site offers API for their points system?)
   * Logs storage.
-  * General chatting statistics.
+  * General chatting statistics. (+ Leaderboard system)
+    * Level of user "toxicity".
+    * General chat activity:
+      * Chats per minute.
+      * Users per minute.
+      * View count every minute.
+      * Most used emotes every minute (Twitch, Mixer, BTTV, FFZ).
+    * Displaying emotes in the live chat.
+### Low priority
+  * Points system (Maybe streaming site offers API for their points system?)
   * Moderation actions:
     * Time out phrase list.
-### Low priority
+    * PerspectiveAPI?
   * Video requests (Cytube implementation, or custom?)
   * Login system in Web UI.
     * Twitch oauth.

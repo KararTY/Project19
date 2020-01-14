@@ -4,6 +4,9 @@ package-lock.json
 
 tmp
 
+# Logs folder
+logs
+
 # Environment variables, never commit this file
 .env
 

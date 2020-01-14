@@ -46,14 +46,16 @@ class Twitch {
     for (let index = 0; index < json.badges.length; index++) {
       const badge = json.badges[index]
       if (badge.name === 'subscriber') {
-        parsedMessage.subscribedFor = json.badgeInfo.find(b => b.name === 'subscriber').version
+        const subBadge = json.badgeInfo.find(b => b.name === 'subscriber')
+        if (subBadge) parsedMessage.subscribedFor = subBadge.version
+        else console.log(badge)
       }
       parsedMessage.badges.push(badge.name)
     }
 
     parsedMessage.emotes = json.emotes
 
-    parsedMessage.timestamp = moment(json.serverTimestamp)
+    parsedMessage.timestamp = moment(json.serverTimestamp).utc()
 
     if (json.color) parsedMessage.color = json.color
 
