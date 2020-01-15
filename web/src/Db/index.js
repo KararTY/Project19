@@ -82,7 +82,7 @@ class Database {
 
           if (!channels.includes(json.channel.id)) {
             channels.push(json.channel.id)
-            request.channels = JSON.stringify(channels)
+            request.channels = channels
             changes = true
           }
 

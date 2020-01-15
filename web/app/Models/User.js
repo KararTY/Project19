@@ -31,6 +31,10 @@ class User extends Model {
     return JSON.stringify(json)
   }
 
+  setName (name) {
+    return name.toLowerCase()
+  }
+
   static get incrementing () {
     return false
   }
