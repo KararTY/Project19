@@ -71,7 +71,7 @@ class Database {
           request = new User()
           request.userid = `${json.platform.charAt(0)}-${index === 0 ? json.author.id : json.channel.id}`
           request.name = index === 0 ? json.author.name : json.channel.name
-          Logger.debug(`[Db] New user ${request.name}`)
+          Logger.debug('[Db] New user.')
           request.platform = json.platform.toUpperCase()
           if (index === 0) request.channels = JSON.stringify([json.channel.id])
           await request.save()
