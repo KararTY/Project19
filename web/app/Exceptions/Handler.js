@@ -25,7 +25,7 @@ class ExceptionHandler extends BaseExceptionHandler {
     let message
     if (error.code === 'E_ROUTE_NOT_FOUND') {
       message = 'Not found.'
-    } else if (error.code === 'E_PLATFORM_NOT_FOUND') message = error.message
+    } else if (['E_PLATFORM_NOT_FOUND', 'E_USER_NOT_FOUND', 'E_CHANNEL_NOT_FOUND', 'E_TIMESTAMP_INVALID'].includes(error.code)) message = error.message
 
     if (!message) return super.handle(...arguments)
     else {

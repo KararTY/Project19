@@ -1,95 +1,91 @@
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
-const promisify = require('util').promisify
+const { readFile, path, mkdir, Stream } = require('../Utilities/filesys')
 
-const readFile = promisify(fs.readFile)
-const mkdir = promisify(fs.mkdir)
+const Logger = use('Logger')
 
-/** TODO: SPLIT INTO 3 FOLDERS:
+/** Categorization
  * Channel/Year/Month/Day/_.txt (ALL MESSAGES)
  * Channel/Year/Month/Day/<Userid>.txt
  */
+
+// Timestamps are "moment" Date objects.
 
 class Logs {
   constructor (Config) {
     this.Config = Config || {}
     this.pathToLogs = this.Config.get('logs.pathToFile').toString()
+    this.enabled = this.Config.get('logs.enabled')
+    this.writeTimer = Number(this.Config.get('logs.writeTimer'))
 
     this.queue = []
-    this.writeStreams = []
+    this.streams = []
 
     this.timer = () => setTimeout(async () => {
       const tempQueue = [...this.queue]
+      const tempQueueLen = Number(this.queue.length)
       this.queue = []
 
-      const objects = Object.keys(this.writeStreams)
+      if (tempQueue.length) {
+        const objects = Object.keys(this.streams)
 
-      for (let i = 0; i < objects.length; i++) {
-        const writeStream = this.writeStreams[objects[i]]
+        for (let i = 0; i < objects.length; i++) {
+          const streams = this.streams[objects[i]]
 
-        // Hasn't been updated for some time.
-        if (new Date() - writeStream.lastUpdate >= ((1000 * 60) * 5)) {
-          await writeStream.stream.end()
-          delete this.writeStreams[i]
+          // Hasn't been updated for some time.
+          if (new Date() - streams.lastUpdate >= ((1000 * 60) * 5)) {
+            this.streams[objects[i]].writeStream.end()
+            delete this.streams[objects[i]]
+          }
         }
-      }
 
-      while (tempQueue.length) {
-        const queueItem = tempQueue.shift()
-        await this.writeLog(queueItem.json, queueItem.message)
+        while (tempQueue.length) {
+          const queueItem = tempQueue.shift()
+          await this.writeLog(queueItem.json, queueItem.message)
+        }
+
+        Logger.info(`[Logs] Logged ${tempQueueLen} messages...`)
       }
 
       this.timer()
-    }, typeof Number(this.Config.get('logs.writeTimer')) === 'number' ? Number(this.Config.get('logs.writeTimer')) : (1000 * 60) * 5)
+    }, typeof this.writeTimer === 'number' ? this.writeTimer : (1000 * 60) * 5)
 
-    this.timer()
+    if (this.enabled) this.timer()
   }
 
   queueWrite (json, message) {
-    let error = ''
-    if (!json) error += 'No json.'
-    else if (!message) error += 'No message.'
-    if (error.length > 0) throw new Error(error)
+    if (this.enabled) {
+      let error = ''
+      if (!json) error += 'No json.'
+      else if (!message) error += 'No message.'
+      if (error.length > 0) throw new Error(error)
 
-    this.queue.push({ json, message })
+      this.queue.push({ json, message })
 
-    return this.queue.length
+      return this.queue.length
+    }
   }
 
   async writeLog ({ channel, platform, timestamp, author }, message) {
-    // let pathToFile
-    // if (!user) pathToFile = path.join(this.pathToLogs, channel.platform, channel.id, timestamp.getUTCFullYear().toString(), Number(timestamp.getUTCMonth() + 1).toString(), '_.txt')
     const pathToChannel = path.join(this.pathToLogs, platform, channel.id.toString(), timestamp.year().toString(), Number(timestamp.month() + 1).toString(), timestamp.date().toString(), '_.txt')
     const pathToUser = path.join(pathToChannel.replace('_.txt', `${author.id}.txt`))
 
-    if (!this.writeStreams[channel.id]) {
+    if (!this.streams[channel.id]) {
       await mkdir(pathToChannel.replace('_.txt', ''), { recursive: true })
-
-      // Create new writeStream
-      this.writeStreams[channel.id] = {
-        lastUpdate: new Date(),
-        stream: fs.createWriteStream(pathToChannel, { flags: 'a', encoding: 'utf-8' })
-      }
+      this.streams[channel.id] = new Stream(pathToChannel)
     }
 
-    if (!this.writeStreams[author.id]) {
+    if (!this.streams[author.id]) {
       await mkdir(pathToUser.replace(`${author.id}.txt`, ''), { recursive: true })
-
-      // Create new writeStream
-      this.writeStreams[author.id] = {
-        lastUpdate: new Date(),
-        stream: fs.createWriteStream(pathToUser, { flags: 'a', encoding: 'utf-8' })
-      }
+      this.streams[author.id] = new Stream(pathToUser)
     }
 
     try {
-      this.writeStreams[channel.id].lastUpdate = new Date()
-      this.writeStreams[author.id].lastUpdate = new Date()
+      this.streams[channel.id].lastUpdate = new Date()
+      this.streams[author.id].lastUpdate = new Date()
 
-      await this.writeStreams[channel.id].stream.write(message + '\r\n')
-      await this.writeStreams[author.id].stream.write(message + '\r\n')
+      await this.streams[channel.id].write(message + '\r\n')
+      await this.streams[author.id].write(message + '\r\n')
 
       return Promise.resolve()
     } catch (err) {
@@ -97,13 +93,16 @@ class Logs {
     }
   }
 
-  async displayLog ({ channel, timestamp }, user) {
+  async readLog ({ channel, platform, timestamp }, author) {
     if (!channel) throw new Error('No channel selected.')
 
     try {
       let file
-      if (!user) file = await readFile(path.join(this.pathToLogs, channel.platform, channel.id, timestamp.getUTCFullYear().toString(), Number(timestamp.getUTCMonth() + 1).toString(), '_.txt'), 'utf-8')
-      else file = await readFile(path.join(this.pathToLogs, channel.platform, channel.id, timestamp.getUTCFullYear().toString(), Number(timestamp.getUTCMonth() + 1).toString(), '_.txt'), 'utf-8')
+
+      const pathToChannel = path.join(this.pathToLogs, platform.toLowerCase(), channel.userIdNumber, timestamp.year().toString(), Number(timestamp.month() + 1).toString(), timestamp.date().toString(), '_.txt')
+
+      if (!author) file = await readFile(pathToChannel, 'utf-8')
+      else file = await readFile(path.join(pathToChannel.replace('_.txt', `${author.userIdNumber}.txt`)), 'utf-8')
 
       return Promise.resolve(file)
     } catch (err) {

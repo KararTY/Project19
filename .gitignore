@@ -1,11 +1,11 @@
 # Node modules
-node_modules
+node_modules/
 package-lock.json
 
 tmp
 
 # Logs folder
-logs
+logs/
 
 # Environment variables, never commit this file
 .env

@@ -7,6 +7,7 @@ const PlatformNotFoundException = use('App/Exceptions/PlatformNotFoundException'
 
 Route.get('/live/:platform?/:channel?', async ({ params, request, response, view }) => {
   const format = request.get().format
+
   if (params.platform) {
     const platform = params.platform.toLowerCase()
 

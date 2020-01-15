@@ -6,6 +6,7 @@ const Logger = use('Logger')
 const Twitch = use('Service/Twitch')
 const Mixer = use('Service/Mixer')
 const Logs = use('Service/Logs')
+const Db = use('Service/Db')
 
 class RawChatController {
   constructor ({ socket, request }) {
@@ -24,18 +25,17 @@ class RawChatController {
       const messageObject = twitch || mixer
 
       try {
-        // await Logs.displayLog('0')
-
         const json = await PlatformMessage.parseMessage(messageObject)
         const message = PlatformMessage.displayMessage(json)
 
         if (!json.blacklisted) {
-          // Logger.debug(`[RawChatController] <${platformName.toUpperCase()}> message received: ${message}`)
+          Logger.debug(`[RawChatController] <${platformName.toUpperCase()}> message received: ${message}`)
           const channel = Ws.getChannel('chat:*').topic(topicString)
           if (channel) channel.broadcast('message', message)
         }
 
-        Logs.queueWrite(json, message)
+        Logs.queueWrite({ channel: json.channel, platform: json.platform, timestamp: json.timestamp, author: json.author }, message)
+        Db.queueUser(json)
       } catch (err) {
         console.error(err)
         Logger.debug('Error', err)
@@ -51,9 +51,10 @@ class RawChatController {
           const json = await PlatformMessage.parseMessage(array[index])
           const message = PlatformMessage.displayMessage(json)
 
-          // if (!json.blacklisted) Logger.debug(`[RawChatController] <${platformName.toUpperCase()}> offline message received: ${message}`)
+          if (!json.blacklisted) Logger.debug(`[RawChatController] <${platformName.toUpperCase()}> offline message received: ${message}`)
 
-          Logs.queueWrite(json, message)
+          Logs.queueWrite({ channel: json.channel, platform: json.platform, timestamp: json.timestamp, author: json.author }, message)
+          Db.queueUser(json)
         } catch (err) {
           console.error(err)
           Logger.debug('Error', err)

@@ -13,5 +13,6 @@
 |
 */
 
-require('./routes/index') // .domain/
-require('./routes/live') // .domain/live
+require('./routes/index') // domain/
+require('./routes/live') // domain/live
+require('./routes/logs') // domain/logs
