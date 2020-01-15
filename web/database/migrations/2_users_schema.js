@@ -6,7 +6,7 @@ const Schema = use('Schema')
 class UserSchema extends Schema {
   async up () {
     this.alter('users', table => {
-      table.string('name', 25).unique().comment('User name.')
+      table.string('name', 25).comment('User name.')
     })
   }
 
