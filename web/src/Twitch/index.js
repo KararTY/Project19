@@ -65,7 +65,7 @@ class Twitch {
   }
 
   displayMessage (parsedMessage) {
-    return `[${parsedMessage.timestamp.format('hh:mm')}] ${parsedMessage.author.name}: ${parsedMessage.message}`
+    return `[${parsedMessage.timestamp.format('HH:mm')}] ${parsedMessage.author.name}: ${parsedMessage.message}`
   }
 
   async parseEvent (json) {

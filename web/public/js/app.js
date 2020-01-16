@@ -1,5 +1,7 @@
 const { html, render } = window.lighterhtml
 
+const currentFullPathArray = new URL(window.location.href).pathname.slice(1).split('/')
+
 async function getPath (fullPathArray) {
   const currentPath = fullPathArray[0]
   switch (currentPath) {
@@ -9,6 +11,22 @@ async function getPath (fullPathArray) {
       const channel = fullPathArray[2]
       const rendered = await liveChat(el, platform, channel)
       if (!rendered) render(el, inputChat())
+      break
+    }
+    case 'logs': {
+      const el = document.querySelector('.card-content.content')
+      const platform = fullPathArray[1]
+      const timestamp = fullPathArray[2]
+      const channel = fullPathArray[3]
+      const user = fullPathArray[4]
+      const rendered = await logs(el, platform, timestamp, channel, user)
+      if (!rendered) {
+        render(el, inputLogs())
+        const todayTimestamp = new Date()
+        document.querySelector('input[name="timestamp"]').valueAsDate = timestamp ? new Date(timestamp) : todayTimestamp
+        document.querySelector('input[name="channelName"]').value = channel || ''
+        document.querySelector('input[name="userName"]').value = user || ''
+      }
       break
     }
     default: {
@@ -63,34 +81,22 @@ function inputChat () {
   async function onsubmit ($ev) {
     $ev.preventDefault()
     const form = document.forms.liveChatSearch
+
     const inputtedChannelNameElement = form.elements.channelName
     const inputtedChannelNameValue = inputtedChannelNameElement.value
     const selectedPlatformValue = form.elements.platformName.value
 
-    let errorPath
-    let errorMessage
-    if (inputtedChannelNameValue.length === 0) {
-      errorPath = 'liveChatChannelNameError'
-      errorMessage = "Can't be empty."
+    await liveChat(document.querySelector('.card-content.content'), selectedPlatformValue || 'twitch', inputtedChannelNameValue)
+    const newUrl = new URL(window.location)
+    const fullPath = newUrl.pathname.slice(1).split('/')
+    if (fullPath[0] === 'live') {
+      newUrl.pathname = `/live/${selectedPlatformValue}/${inputtedChannelNameValue}`
+    } else {
+      newUrl.searchParams.append('platform', selectedPlatformValue || 'twitch')
+      newUrl.searchParams.append('chat', inputtedChannelNameValue)
     }
-
-    if (errorMessage && !document.getElementById(errorPath)) {
-      inputtedChannelNameElement.parentElement.appendChild(html.node`
-        <p id="${errorPath}" class="help is-danger">${errorMessage}</p>
-      `)
-    } else if (!errorMessage) {
-      await liveChat(document.querySelector('.card-content.content'), selectedPlatformValue || 'twitch', inputtedChannelNameValue)
-      const newUrl = new URL(window.location)
-      const fullPath = newUrl.pathname.slice(1).split('/')
-      if (fullPath[0] === 'live') {
-        newUrl.pathname = `/live/${selectedPlatformValue}/${inputtedChannelNameValue}`
-      } else {
-        newUrl.searchParams.append('platform', selectedPlatformValue || 'twitch')
-        newUrl.searchParams.append('chat', inputtedChannelNameValue)
-      }
-      document.title = `${document.title} - ${inputtedChannelNameValue.toUpperCase()}`
-      window.history.replaceState({}, `${document.title} - ${inputtedChannelNameValue.toUpperCase()}`, newUrl)
-    }
+    document.title = `${document.title} - ${inputtedChannelNameValue.toUpperCase()}`
+    window.history.replaceState({}, `${document.title} - ${inputtedChannelNameValue.toUpperCase()}`, newUrl)
   }
 
   return html`
@@ -106,7 +112,60 @@ function inputChat () {
           </span>
         </div>
         <div class="control">
-          <input class="input" type="text" name="channelName" placeholder="Channel name...">
+          <input class="input" type="text" name="channelName" placeholder="Channel name..." required>
+        </div>
+        <div class="control">
+          <button class="button" type="submit">Search</button>
+        </div>
+      </div>
+    </form>
+  `
+}
+
+function inputLogs () {
+  async function onsubmit ($ev) {
+    $ev.preventDefault()
+    const form = document.forms.logsSearch
+
+    const selectedPlatformValue = form.elements.platformName.value
+
+    const inputtedTimestampElement = form.elements.timestamp
+    const inputtedTimestampValue = inputtedTimestampElement.value
+
+    const inputtedChannelNameElement = form.elements.channelName
+    const inputtedChannelNameValue = inputtedChannelNameElement.value
+
+    const inputtedUserNameValue = form.elements.userName.value
+
+    const newUrl = new URL(window.location)
+    newUrl.pathname = `/logs/${selectedPlatformValue}/${inputtedTimestampValue}/${inputtedChannelNameValue}${inputtedUserNameValue ? `/${inputtedUserNameValue}` : ''}`
+    document.title = `Logs - ${inputtedChannelNameValue.toUpperCase()} - ${inputtedTimestampValue}`
+    window.history.replaceState({}, `${document.title}`, newUrl)
+
+    await logs(document.querySelector('.card-content'), selectedPlatformValue || 'twitch', inputtedTimestampValue, inputtedChannelNameValue, inputtedUserNameValue)
+  }
+
+  const todayTimestamp = new Date().toLocaleDateString('en-SE')
+  return html`
+    <h1>Logs</h1>
+    <form name="logsSearch" onsubmit=${onsubmit}>
+      <div class="field has-addons">
+        <div class="control">
+          <span class="select">
+            <select name="platformName">
+              <option value="twitch" selected="${window.location.pathname.slice(1).split('/').length > 1 && window.location.pathname.slice(1).split('/')[1].toLowerCase() === 'twitch'}">Twitch</option>
+              <option value="mixer" selected="${window.location.pathname.slice(1).split('/').length > 1 && window.location.pathname.slice(1).split('/')[1].toLowerCase() === 'mixer'}">Mixer</option>
+            </select>
+          </span>
+        </div>
+        <div class="control">
+          <input class="input" type="date" name="timestamp" min="2020-01-16" max="${todayTimestamp}" valueAsDate="${new Date()}" required>
+        </div>
+        <div class="control">
+          <input class="input" type="text" name="channelName" placeholder="Channel name..." required>
+        </div>
+        <div class="control">
+          <input class="input" type="text" name="userName" placeholder="User name...">
         </div>
         <div class="control">
           <button class="button" type="submit">Search</button>
@@ -132,5 +191,21 @@ async function liveChat (el, platform, channel) {
   } else return false
 }
 
-const currentFullPathArray = new URL(window.location.href).pathname.slice(1).split('/')
+async function logs (el, platform, timestamp, channel, user) {
+  if (channel) {
+    const response = await fetch(window.location.href, { method: 'POST' })
+    if (response.status === 200) {
+      const logFile = await response.text()
+      render(el, html`
+        <div class="logs">${logFile}</div>
+      `)
+      return true
+    } else {
+      const error = await response.json()
+      window.alert(`Error ${error.message}`)
+    }
+  }
+  return false
+}
+
 Promise.all([getPath(currentFullPathArray)]).then(rs => rs.forEach(r => console.log(r)))

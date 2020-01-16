@@ -8,12 +8,18 @@ const PlatformNotFoundException = use('App/Exceptions/PlatformNotFoundException'
 const TimestampInvalidException = use('App/Exceptions/TimestampInvalidException')
 const ChannelNotFoundException = use('App/Exceptions/ChannelNotFoundException')
 const UserNotFoundException = use('App/Exceptions/UserNotFoundException')
+const LogsNotFoundException = use('App/Exceptions/LogsNotFoundException')
 
 const Logs = use('Service/Logs')
 const User = use('App/Models/User')
 
-Route.get('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ params, request, response, view }) => {
-  // const format = request.get().format
+Route.route('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ params, request, view }) => {
+  const method = request.method()
+
+  console.log(method)
+
+  let format
+  if (method === 'GET') format = request.get().format
 
   let platform
   if (params.platform) {
@@ -32,47 +38,39 @@ Route.get('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ para
   }
 
   let channel
+  let channelName
   if (params.channelname) {
-    const channelName = params.channelname.toLowerCase()
-    channel = await User.findBy('name', channelName)
+    channelName = params.channelname.toLowerCase()
+    channel = await User.query().where('name', channelName).where('platform', platform.toUpperCase()).fetch()
+    channel = channel.toJSON()[0]
     if (!channel) throw new ChannelNotFoundException()
   }
 
   let user
   if (params.username) {
     const userName = params.username.toLowerCase()
-    user = await User.findBy('name', userName)
+    user = await User.query().where('name', userName).where('platform', platform.toUpperCase()).fetch()
+    user = user.toJSON()[0]
+    console.log(user)
     if (!user) throw new UserNotFoundException()
   }
 
-  if (channel) {
-    let logFile
-    if (user) {
-      logFile = await Logs.readLog({ channel: channel.toJSON(), platform, timestamp: moment(timestamp) }, user.toJSON())
-    } else {
-      // Display all of chat
-      logFile = await Logs.readLog({ channel: channel.toJSON(), platform, timestamp: moment(timestamp) })
-    }
+  let logFile
+  if ((channel && method === 'POST') || (format && format === 'plain')) logFile = await Logs.readLog({ channel: channel, platform, timestamp: moment(timestamp) }, user || undefined)
 
-    return logFile
+  if (method === 'POST') {
+    if (logFile && logFile.length) return logFile
+    else throw new LogsNotFoundException()
   } else {
-
+    return view.render((format && format === 'plain')
+      ? 'partials.logs-plain'
+      : 'core.template', {
+      web: {
+        title: `Logs${channelName ? ` - ${channelName.toUpperCase()}` : ''}${timestamp ? ` - ${timestamp}` : ''}`,
+        template: 'partials.logs',
+        navbarActive: 'logs',
+        logFile: logFile || new LogsNotFoundException()
+      }
+    })
   }
-
-  // if (format && format === 'plain' && params.platform && params.channel) {
-  //   return view.render('partials.live-plain', {
-  //     web: {
-  //       title: `Live chat - ${params.channel.toUpperCase()}`,
-  //       navbarActive: 'live'
-  //     }
-  //   })
-  // } else {
-  //   return view.render('core.template', {
-  //     web: {
-  //       title: `Live chat${params.channel ? ` - ${params.channel.toUpperCase()}` : ''}`,
-  //       template: 'partials.live',
-  //       navbarActive: 'live'
-  //     }
-  //   })
-  // }
-}).as('logs')
+}, ['GET', 'POST']).as('logs')

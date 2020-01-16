@@ -34,10 +34,10 @@ Since the project is still a work in progress, all updates will most likely intr
 
 ## Planned features
 ### High priority
-  * Platform support:
-    * Twitch.
-    * Mixer.
-  * Logs storage.
+  * ~~Platform support:~~
+    * ~~Twitch.~~
+    * ~~Mixer.~~
+  * ~~Logs storage.~~
   * General chatting statistics. (+ Leaderboard system)
     * Level of user "toxicity".
     * General chat activity:

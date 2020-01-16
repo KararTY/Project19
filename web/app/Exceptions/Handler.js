@@ -22,14 +22,16 @@ class ExceptionHandler extends BaseExceptionHandler {
    * @return {void}
    */
   async handle (error, { response, request }) {
+    const method = request.method()
+
     let message
     if (error.code === 'E_ROUTE_NOT_FOUND') {
       message = 'Not found.'
-    } else if (['E_PLATFORM_NOT_FOUND', 'E_USER_NOT_FOUND', 'E_CHANNEL_NOT_FOUND', 'E_TIMESTAMP_INVALID'].includes(error.code)) message = error.message
+    } else if (['E_PLATFORM_NOT_FOUND', 'E_USER_NOT_FOUND', 'E_CHANNEL_NOT_FOUND', 'E_TIMESTAMP_INVALID', 'E_LOGS_NOT_FOUND'].includes(error.code)) message = error.message
 
     if (!message) return super.handle(...arguments)
-    else {
-      return response.send(`
+    else if (method === 'GET') {
+      return response.status(error.status).send(`
         <html>
           <head>
             <link rel="stylesheet" text="text/css" href="/css/stylesheet.css" />
@@ -44,6 +46,12 @@ class ExceptionHandler extends BaseExceptionHandler {
           </body>
         </html>
       `.replace(/\s\s/g, ''))
+    } else {
+      return response.status(error.status).json({
+        code: error.code,
+        status: error.status,
+        message: error.message
+      })
     }
   }
 
