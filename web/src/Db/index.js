@@ -16,19 +16,18 @@ class Database {
       this.queue = []
 
       if (tempQueue.length) {
-        const map = new Map()
+        const arr = []
         let counter = 0
+
         while (tempQueue.length) {
           const queueItem = tempQueue.shift()
 
           let cont = false
 
-          if (!map.has(queueItem.author.id)) {
+          const platformUserAndChannel = `${queueItem.platform.charAt(0)}-${queueItem.author.id}-${queueItem.channel.id}`
+          if (!arr.includes(platformUserAndChannel)) {
+            arr.push(platformUserAndChannel)
             cont = true
-            map.set(queueItem.author.id)
-          } else if (!map.has(queueItem.channel.id)) {
-            cont = true
-            map.set(queueItem.channel.id)
           }
 
           if (cont) {
@@ -73,20 +72,17 @@ class Database {
           request.name = index === 0 ? json.author.name : json.channel.name
           Logger.debug('[Db] New user.')
           request.platform = json.platform.toUpperCase()
-          if (index === 0) request.channels = JSON.stringify([json.channel.id])
+          if (index === 0) request.channels = [json.channel.id]
           await request.save()
         } else if (index === 0) {
           let changes = false
 
-          const channels = JSON.parse(request.channels)
-
-          if (!channels.includes(json.channel.id)) {
-            channels.push(json.channel.id)
-            request.channels = channels
+          if (!request.channels.includes(json.channel.id)) {
+            request.channels = request.channels.concat(json.channel.id)
             changes = true
           }
 
-          if (request.name !== json.author.name) {
+          if (request.name !== json.author.name.toLowerCase()) {
             request.name = json.author.name
             changes = true
           }
@@ -98,7 +94,7 @@ class Database {
         } else if (index === 1) {
           let changes = false
 
-          if (request.name !== json.channel.name) {
+          if (request.name !== json.channel.name.toLowerCase()) {
             request.name = json.channel.name
             changes = true
           }
