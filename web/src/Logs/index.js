@@ -39,6 +39,10 @@ class Logs {
           }
         }
 
+        tempQueue.sort((a, b) => {
+          return a.timestamp - b.timestamp
+        })
+
         while (tempQueue.length) {
           const queueItem = tempQueue.shift()
           await this.writeLog(queueItem.json, queueItem.message)

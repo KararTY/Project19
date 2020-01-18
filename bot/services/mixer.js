@@ -5,8 +5,6 @@ const ws = require('ws')
 
 let isDebug
 
-let messageWebsocketFullyOnline = false
-let eventWebsocketFullyOnline = false
 let messages = []
 let events = []
 
@@ -24,7 +22,6 @@ async function initialize ({ messageClient, eventClient }, testChannels, isdebug
 
   messageClient.on('socketJoinAck', topic => {
     if (topic === messageClient.socket.topic) {
-      messageWebsocketFullyOnline = true
       if (messages.length > 0) {
         messageClient.emit('chat', { mixerOfflineBatch: messages })
         messages = []
@@ -34,20 +31,11 @@ async function initialize ({ messageClient, eventClient }, testChannels, isdebug
 
   eventClient.on('socketJoinAck', topic => {
     if (topic === eventClient.socket.topic) {
-      eventWebsocketFullyOnline = true
       if (events.length > 0) {
         eventClient.emit('chat', { mixerOfflineBatch: events })
         events = []
       }
     }
-  })
-
-  messageClient.on('socketOffline', () => {
-    messageWebsocketFullyOnline = false
-  })
-
-  eventClient.on('socketOffline', () => {
-    eventWebsocketFullyOnline = false
   })
 
   messageClient.on('keepMixerData', data => {
@@ -109,7 +97,8 @@ async function createChatSocket (channelData, channel, { messageClient, eventCli
       data.token = socket.__token.toLowerCase()
 
       if (isDebug) console.log(`Mixer: #${data.token} ${data.user_name}: ${data.message.message.map(message => message.text).join('')}`)
-      if (messageWebsocketFullyOnline) messageClient.emit('chat', { mixer: data })
+
+      if (String(messageClient.socket.socket.readyState) === '1') messageClient.emit('chat', { mixer: data })
       else messages.push(data)
     })
 
@@ -117,7 +106,8 @@ async function createChatSocket (channelData, channel, { messageClient, eventCli
       event.token = socket.__token.toLowerCase()
 
       if (isDebug) console.log(`Mixer Event: #${event.token} ${event.user_name}: Executed [${event.skill.skill_name}] for ${event.skill.cost} ${event.skill.currency}.`)
-      if (eventWebsocketFullyOnline) eventClient.emit('chat', { mixer: event })
+
+      if (String(eventClient.socket.socket.readyState) === '1') eventClient.emit('event', { mixer: event })
       else events.push(event)
     })
 

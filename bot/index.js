@@ -64,7 +64,7 @@ messageClient.events.on('chat', data => {
   }
 })
 
-eventClient.events.on('chat', data => {
+eventClient.events.on('event', data => {
   if (data.twitch || data.twitchOfflineBatch) {
     const twitch = data.twitch || data.twitchOfflineBatch
     if (isDebug && data.twitchOfflineBatch) console.log(`Client: Sending over twitch ${twitch.length} events.`)

@@ -4,8 +4,6 @@ const { ChatClient } = require('dank-twitch-irc')
 const client = new ChatClient({ username: process.env.TWITCH_BOT_USERNAME, password: process.env.TWITCH_CHAT_TOKEN })
 
 async function initialize ({ messageClient, eventClient }, testChannels, isDebug) {
-  let messageWebsocketFullyOnline = false
-  let eventWebsocketFullyOnline = false
   let messages = []
   let events = []
 
@@ -28,19 +26,20 @@ async function initialize ({ messageClient, eventClient }, testChannels, isDebug
 
   client.on('PRIVMSG', msg => {
     if (isDebug) console.log(`Twitch: #${msg.channelName} ${msg.displayName}: ${msg.messageText}`)
-    if (messageWebsocketFullyOnline) messageClient.emit('chat', { twitch: msg })
+
+    if (String(messageClient.socket.socket.readyState) === '1') messageClient.emit('chat', { twitch: msg })
     else messages.push(msg)
   })
 
   client.on('USERNOTICE', event => {
     if (isDebug) console.log(`Twitch Event: #${event.channelName} ${event.displayName}: ${event.systemMessage}`)
-    if (eventWebsocketFullyOnline) eventClient.emit('event', { twitch: event })
+
+    if (String(eventClient.socket.socket.readyState) === '1') eventClient.emit('event', { twitch: event })
     else events.push(event)
   })
 
   messageClient.on('socketJoinAck', topic => {
     if (topic === messageClient.socket.topic) {
-      messageWebsocketFullyOnline = true
       if (messages.length > 0) {
         messageClient.emit('chat', { twitchOfflineBatch: messages })
         messages = []
@@ -50,20 +49,11 @@ async function initialize ({ messageClient, eventClient }, testChannels, isDebug
 
   eventClient.on('socketJoinAck', topic => {
     if (topic === eventClient.socket.topic) {
-      eventWebsocketFullyOnline = true
       if (events.length > 0) {
         eventClient.emit('event', { twitchOfflineBatch: messages })
         events = []
       }
     }
-  })
-
-  messageClient.on('socketOffline', () => {
-    messageWebsocketFullyOnline = false
-  })
-
-  eventClient.on('socketOffline', () => {
-    eventWebsocketFullyOnline = false
   })
 
   messageClient.on('keepTwitchData', data => {

@@ -69,7 +69,7 @@ class Database {
         if (request === null) {
           request = new User()
           request.userid = `${json.platform.charAt(0)}-${index === 0 ? json.author.id : json.channel.id}`
-          request.name = index === 0 ? json.author.name : json.channel.name
+          request.name = index === 0 ? json.author.username : json.channel.name
           Logger.debug('[Db] New user.')
           request.platform = json.platform.toUpperCase()
           if (index === 0) request.channels = [json.channel.id]
@@ -82,8 +82,8 @@ class Database {
             changes = true
           }
 
-          if (request.name !== json.author.name.toLowerCase()) {
-            request.name = json.author.name
+          if (request.name !== json.author.username.toLowerCase()) {
+            request.name = json.author.username
             changes = true
           }
 

@@ -23,6 +23,7 @@ class Mixer {
    * @param {Object} json.message.meta
    * @param {Boolean?} json.message.meta.whisper
    * @param {Boolean?} json.message.meta.me
+   * @param {String} json.id
    */
   async parseMessage (json) {
     const plainText = json.message.message.map(message => message.text || '').join('')
@@ -38,6 +39,7 @@ class Mixer {
 
     parsedMessage.author = {
       name: json.user_name,
+      username: json.user_name,
       id: json.user_id,
       level: json.user_level,
       ascensionLevel: json.user_ascension_level
@@ -57,12 +59,32 @@ class Mixer {
     return `[${parsedMessage.timestamp.format('HH:mm')}] ${levels ? `[LVL ${parsedMessage.author.level}] ` : ''}${parsedMessage.author.name}${levels ? ` [${parsedMessage.author.ascensionLevel}]` : ''}: ${parsedMessage.message}`
   }
 
+  /**
+   * Mixer SKILL ATTRIBUTION message.
+   * @param {Object} json [Documentation](https://dev.mixer.com/reference/chat/events/skillattribution)
+   * @param {Object} json.skill
+   * @param {String} json.skill.skill_id
+   * @param {String} json.skill.skill_name
+   * @param {String} json.skill.execution_id
+   * @param {String} json.skill.icon_url
+   * @param {String} json.skill.cost
+   * @param {String} json.skill.currency
+   */
   async parseEvent (json) {
+    const parsedMessage = await this.parseMessage(json)
 
+    parsedMessage.event = {
+      name: json.skill.skill_name,
+      icon: json.skill.icon_url,
+      cost: json.skill.cost,
+      currency: json.skill.currency
+    }
+
+    return parsedMessage
   }
 
   displayEvent (parsedEvent) {
-
+    return `[${parsedEvent.timestamp.format('HH:mm')}] ${parsedEvent.author.name} executed ${parsedEvent.event.name} for ${parsedEvent.event.cost} ${parsedEvent.event.currency}.`
   }
 }
 module.exports = Mixer

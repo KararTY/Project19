@@ -6,6 +6,9 @@ const Logger = use('Logger')
 const Twitch = use('Service/Twitch')
 const Mixer = use('Service/Mixer')
 const Logs = use('Service/Logs')
+const Db = use('Service/Db')
+
+const StreamEvent = use('App/Models/StreamEvent')
 
 class RawStreamEventController {
   constructor ({ socket, request }) {
@@ -29,9 +32,24 @@ class RawStreamEventController {
        *  value: string, len 64
        * }
        */
-
       try {
-        // Logger.debug(`[RawStreamEventController] event received: ${message}`)
+        const json = await PlatformEvent.parseEvent(eventObject)
+        const message = PlatformEvent.displayEvent(json)
+
+        if (!json.blacklisted) {
+          Logger.debug(`[RawStreamEventController] <${platformName.toUpperCase()}> event received: ${message}`)
+          const channel = Ws.getChannel('streamevent:*').topic(topicString)
+          if (channel) channel.broadcast('message', message)
+        }
+
+        Logs.queueWrite({ channel: json.channel, platform: json.platform, timestamp: json.timestamp, author: json.author }, message)
+        if (json.author.username) Db.queueUser(json)
+
+        const streamEvent = new StreamEvent()
+        streamEvent.userid = `${platformName.charAt(0)}-${json.channel.id}`
+        streamEvent.event_name = json.event.type
+        streamEvent.event_value = json.importantValue
+        await streamEvent.save()
       } catch (err) {
         console.error(err)
         Logger.debug('Error', err)
@@ -42,11 +60,25 @@ class RawStreamEventController {
 
       Logger.debug(`[RawStreamEventController] ${platformName.toUpperCase()} events batch received: ${array.length}`)
 
-      try {
+      for (let index = 0; index < array.length; index++) {
+        try {
+          const json = await PlatformEvent.parseEvent(array[index])
+          const message = PlatformEvent.displayEvent(json)
 
-      } catch (err) {
-        console.error(err)
-        Logger.debug('Error', err)
+          if (!json.blacklisted) Logger.debug(`[RawStreamEventController] <${platformName.toUpperCase()}> offline event received: ${message}`)
+
+          Logs.queueWrite({ channel: json.channel, platform: json.platform, timestamp: json.timestamp, author: json.author }, message)
+          if (json.author.username) Db.queueUser(json)
+
+          const streamEvent = new StreamEvent()
+          streamEvent.userid = `${platformName.charAt(0)}-${json.channel.id}`
+          streamEvent.event_name = json.event.type
+          streamEvent.event_value = json.importantValue
+          await streamEvent.save()
+        } catch (err) {
+          console.error(err)
+          Logger.debug('Error', err)
+        }
       }
     }
   }

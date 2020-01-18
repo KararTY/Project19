@@ -16,8 +16,6 @@ const User = use('App/Models/User')
 Route.route('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ params, request, view }) => {
   const method = request.method()
 
-  console.log(method)
-
   let format
   if (method === 'GET') format = request.get().format
 
