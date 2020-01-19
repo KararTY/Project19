@@ -19,6 +19,7 @@ class ChatUpdateController {
           if (!res.rows.length) {
             const err = new ChannelNotFoundException()
             socket.emit('error', { code: err.code, message: err.message })
+            socket.close()
           }
         })
       }
