@@ -1,6 +1,7 @@
 const { html, render } = window.lighterhtml
 
-const currentFullPathArray = new URL(window.location.href).pathname.slice(1).split('/')
+const url = new URL(window.location)
+const currentFullPathArray = url.pathname.slice(1).split('/')
 
 async function getPath (fullPathArray) {
   const currentPath = fullPathArray[0]
@@ -23,9 +24,10 @@ async function getPath (fullPathArray) {
       if (!rendered) {
         render(el, inputLogs())
         const todayTimestamp = new Date()
-        document.querySelector('input[name="timestamp"]').valueAsDate = timestamp ? new Date(timestamp) : todayTimestamp
-        document.querySelector('input[name="channelName"]').value = channel || ''
-        document.querySelector('input[name="userName"]').value = user || ''
+        const paramTimestamp = url.searchParams.get('timestamp')
+        document.querySelector('input[name="timestamp"]').valueAsDate = (timestamp ? new Date(timestamp) : (paramTimestamp ? new Date(paramTimestamp) : todayTimestamp))
+        document.querySelector('input[name="channelName"]').value = channel || url.searchParams.get('channelname')
+        document.querySelector('input[name="userName"]').value = user || url.searchParams.get('username')
       }
       break
     }
@@ -86,19 +88,20 @@ function inputChat () {
     const inputtedChannelNameValue = inputtedChannelNameElement.value
     const selectedPlatformValue = form.elements.platformName.value
 
-    await liveChat(document.querySelector('.card-content.content'), selectedPlatformValue || 'twitch', inputtedChannelNameValue)
     const newUrl = new URL(window.location)
-    const fullPath = newUrl.pathname.slice(1).split('/')
-    if (fullPath[0] === 'live') {
-      newUrl.pathname = `/live/${selectedPlatformValue}/${inputtedChannelNameValue}`
-    } else {
-      newUrl.searchParams.append('platform', selectedPlatformValue || 'twitch')
-      newUrl.searchParams.append('chat', inputtedChannelNameValue)
-    }
-    document.title = `${document.title} - ${inputtedChannelNameValue.toUpperCase()}`
-    window.history.replaceState({}, `${document.title} - ${inputtedChannelNameValue.toUpperCase()}`, newUrl)
+    const redirectUrl = new URL(window.location)
+    redirectUrl.search = ''
+    redirectUrl.searchParams.set('redirect', 'true')
+
+    newUrl.searchParams.set('platform', selectedPlatformValue)
+    newUrl.searchParams.set('channelname', inputtedChannelNameValue)
+    window.history.replaceState({}, document.title, newUrl)
+
+    redirectUrl.pathname = `/live/${selectedPlatformValue}/${inputtedChannelNameValue}`
+    window.location.href = redirectUrl
   }
 
+  const selectedPlatform = window.location.pathname.slice(1).split('/').length > 1 ? window.location.pathname.slice(1).split('/')[1].toLowerCase() : url.searchParams.get('platform')
   return html`
     <h1>Live chat</h1>
     <form name="liveChatSearch" onsubmit=${onsubmit}>
@@ -106,13 +109,13 @@ function inputChat () {
         <div class="control">
           <span class="select">
             <select name="platformName">
-              <option value="twitch" selected="${window.location.pathname.slice(1).split('/').length > 1 && window.location.pathname.slice(1).split('/')[1].toLowerCase() === 'twitch'}">Twitch</option>
-              <option value="mixer" selected="${window.location.pathname.slice(1).split('/').length > 1 && window.location.pathname.slice(1).split('/')[1].toLowerCase() === 'mixer'}">Mixer</option>
+              <option value="twitch" selected="${selectedPlatform === 'twitch'}">Twitch</option>
+              <option value="mixer" selected="${selectedPlatform === 'mixer'}">Mixer</option>
             </select>
           </span>
         </div>
         <div class="control">
-          <input class="input" type="text" name="channelName" placeholder="Channel name..." required>
+          <input class="input" type="text" name="channelName" placeholder="Channel name..." value="${url.searchParams.get('channelname')}" required>
         </div>
         <div class="control">
           <button class="button" type="submit">Search</button>
@@ -138,14 +141,22 @@ function inputLogs () {
     const inputtedUserNameValue = form.elements.userName.value
 
     const newUrl = new URL(window.location)
-    newUrl.pathname = `/logs/${selectedPlatformValue}/${inputtedTimestampValue}/${inputtedChannelNameValue}${inputtedUserNameValue ? `/${inputtedUserNameValue}` : ''}`
-    document.title = `Logs - ${inputtedChannelNameValue.toUpperCase()} - ${inputtedTimestampValue}`
-    window.history.replaceState({}, `${document.title}`, newUrl)
+    const redirectUrl = new URL(window.location)
+    redirectUrl.search = ''
+    redirectUrl.searchParams.set('redirect', 'true')
 
-    await logs(document.querySelector('.card-content'), selectedPlatformValue || 'twitch', inputtedTimestampValue, inputtedChannelNameValue, inputtedUserNameValue)
+    newUrl.searchParams.set('platform', selectedPlatformValue)
+    newUrl.searchParams.set('timestamp', inputtedTimestampValue)
+    newUrl.searchParams.set('channelname', inputtedChannelNameValue)
+    if (inputtedUserNameValue) newUrl.searchParams.append('username', inputtedUserNameValue)
+    window.history.replaceState({}, document.title, newUrl)
+
+    redirectUrl.pathname = `/logs/${selectedPlatformValue}/${inputtedTimestampValue}/${inputtedChannelNameValue}${inputtedUserNameValue ? `/${inputtedUserNameValue}` : ''}`
+    window.location.href = redirectUrl
   }
 
   const todayTimestamp = new Date().toLocaleDateString('en-SE')
+  const selectedPlatform = window.location.pathname.slice(1).split('/').length > 1 ? window.location.pathname.slice(1).split('/')[1].toLowerCase() : url.searchParams.get('platform')
   return html`
     <h1>Logs</h1>
     <form name="logsSearch" onsubmit=${onsubmit}>
@@ -153,8 +164,8 @@ function inputLogs () {
         <div class="control">
           <span class="select">
             <select name="platformName">
-              <option value="twitch" selected="${window.location.pathname.slice(1).split('/').length > 1 && window.location.pathname.slice(1).split('/')[1].toLowerCase() === 'twitch'}">Twitch</option>
-              <option value="mixer" selected="${window.location.pathname.slice(1).split('/').length > 1 && window.location.pathname.slice(1).split('/')[1].toLowerCase() === 'mixer'}">Mixer</option>
+              <option value="twitch" selected="${selectedPlatform === 'twitch'}">Twitch</option>
+              <option value="mixer" selected="${selectedPlatform === 'mixer'}">Mixer</option>
             </select>
           </span>
         </div>
@@ -197,12 +208,14 @@ async function logs (el, platform, timestamp, channel, user) {
     if (response.status === 200) {
       const logFile = await response.text()
       render(el, html`
+        <p><a href="${window.location.href}?format=plain">Click here, or add <span>?format=plain</span> to current url, to only see logs.</a></p>
         <div class="logs">${logFile}</div>
       `)
       return true
     } else {
       const error = await response.json()
       window.alert(`Error ${error.message}`)
+      if (new URL(window.location).searchParams.has('redirect')) window.history.back()
     }
   }
   return false

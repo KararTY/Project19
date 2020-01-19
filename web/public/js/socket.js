@@ -1,19 +1,23 @@
 /* global adonis */
 let ws = null
 
+function onWsOpen (ws) {
+  return new Promise(resolve => {
+    ws.on('open', () => {
+      ws.clearListeners()
+      resolve()
+    })
+  })
+}
+
 // eslint-disable-next-line no-unused-vars
 async function startChat (platform, channel) {
   ws = adonis.Ws(null, { path: 'ws' }).connect()
 
-  ws.on('open', async () => {
-    document.getElementById('connection').innerText = 'Websocket online.'
-    await subscribeToChannel(platform, channel)
-    return Promise.resolve()
-  })
-
-  ws.on('error', (err) => {
-    document.getElementById('connection').innerText = `Error: ${err.message}`
-  })
+  await onWsOpen(ws)
+  document.getElementById('connection').innerText = 'Websocket online.'
+  await subscribeToChannel(platform, channel)
+  return Promise.resolve()
 }
 
 async function subscribeToChannel (platform, channel) {
@@ -23,8 +27,12 @@ async function subscribeToChannel (platform, channel) {
     return Promise.resolve()
   })
 
-  chat.on('error', () => {
-    document.getElementById('connection').innerText = 'Connected to websocket, but erroring.'
+  chat.on('error', err => {
+    document.getElementById('connection').innerText = err.message
+    if (err.code === 'E_CHANNEL_NOT_FOUND' && new URL(window.location).searchParams.has('redirect')) {
+      window.alert(`Error ${err.message}`)
+      window.history.back()
+    }
   })
 
   chat.on('message', message => {
