@@ -26,8 +26,10 @@ $text-strong: $whiteSmoke;
 /* Components overwrite */
 $dark: $grey-light;
 $link: $primary;
-$link-hover: $northTexasGreen;
-$link-hover-border: $malachite;
+$link-hover: $malachite;
+$link-focus: $malachite;
+$link-hover-border: $northTexasGreen;
+$link-active: $northTexasGreen;
 
 // General
 $body-background-color: $grey-darker;

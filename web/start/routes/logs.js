@@ -49,7 +49,6 @@ Route.route('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ pa
     const userName = params.username.toLowerCase()
     user = await User.query().where('name', userName).where('platform', platform.toUpperCase()).fetch()
     user = user.toJSON()[0]
-    console.log(user)
     if (!user) throw new UserNotFoundException()
   }
 

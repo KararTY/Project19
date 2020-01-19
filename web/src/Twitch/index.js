@@ -4,6 +4,8 @@ const blacklist = require('../Utilities/blacklist')
 const ParsedMessage = require('../Utilities/parsedMessage')
 const moment = require('moment')
 
+const Logger = use('Logger')
+
 class Twitch {
   constructor (Config) {
     this.Config = Config || {}
@@ -52,7 +54,7 @@ class Twitch {
       if (badge.name === 'subscriber') {
         const subBadge = json.badgeInfo.find(b => b.name === 'subscriber')
         if (subBadge) parsedMessage.subscribedFor = subBadge.version
-        else console.log(badge)
+        else Logger.warn(`[Twitch] Unknown badge found, ${JSON.stringify(badge, null, 2)}`)
       }
       parsedMessage.badges.push(badge.name)
     }

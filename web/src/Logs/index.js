@@ -93,7 +93,7 @@ class Logs {
 
       return Promise.resolve()
     } catch (err) {
-      console.log(err)
+      Logger.warn('[Logs] Error in writeLog %j', err)
     }
   }
 
@@ -110,7 +110,7 @@ class Logs {
 
       return Promise.resolve(file)
     } catch (err) {
-      if (err.code !== 'ENOENT') console.log(err)
+      if (err.code !== 'ENOENT') Logger.warn('[Logs] Error in readLog %j', err)
     }
   }
 }
