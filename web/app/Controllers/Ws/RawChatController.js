@@ -7,11 +7,14 @@ const Twitch = use('Service/Twitch')
 const Mixer = use('Service/Mixer')
 const Logs = use('Service/Logs')
 const Db = use('Service/Db')
+const Socket = use('Service/Socket')
 
 class RawChatController {
   constructor ({ socket, request }) {
     this.socket = socket
     this.request = request
+
+    Socket.addConnection(socket)
 
     // Logger.debug('%j', { socket, request })
   }
@@ -37,8 +40,7 @@ class RawChatController {
         Logs.queueWrite({ channel: json.channel, platform: json.platform, timestamp: json.timestamp, author: json.author }, message)
         Db.queueUser(json)
       } catch (err) {
-        console.error(err)
-        Logger.debug('Error', err)
+        Logger.error('[RawChatController] Error %j', err)
       }
     } else if (twitchOfflineBatch || mixerOfflineBatch) {
       const PlatformMessage = twitchOfflineBatch ? Twitch : mixerOfflineBatch ? Mixer : false
@@ -56,8 +58,7 @@ class RawChatController {
           Logs.queueWrite({ channel: json.channel, platform: json.platform, timestamp: json.timestamp, author: json.author }, message)
           Db.queueUser(json)
         } catch (err) {
-          console.error(err)
-          Logger.debug('Error', err)
+          Logger.error('[RawChatController] Error %j', err)
         }
       }
     }
@@ -67,6 +68,8 @@ class RawChatController {
 
   onClose (close) {
     Logger.debug('[RawChatController] "close":\n%j', close)
+    Socket.deleteConnection(this.socket)
+
     // same as: socket.on('close')
   }
 

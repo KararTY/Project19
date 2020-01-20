@@ -3,19 +3,27 @@
 const { ChatClient } = require('dank-twitch-irc')
 const client = new ChatClient({ username: process.env.TWITCH_BOT_USERNAME, password: process.env.TWITCH_CHAT_TOKEN })
 
-async function initialize ({ messageClient, eventClient }, testChannels, isDebug) {
+async function initialize ({ messageClient, eventClient }, isDebug) {
   let messages = []
   let events = []
+  const streamers = []
+
+  async function addNewStreamer (user) {
+    if (streamers.includes(user.name)) {
+      console.log('Twitch: Already added streamer. Skipping.')
+    } else if (client.ready) {
+      await client.join(user.name)
+      console.log('Twitch: Joined', user.name)
+      streamers.push(user.name)
+    } else {
+      setTimeout(() => {
+        addNewStreamer(user)
+      }, 1000)
+    }
+  }
 
   client.on('ready', async () => {
     if (isDebug) console.log('Twitch: Successfully connected to Twitch IRC.')
-
-    // Join chatrooms
-    for (let index = 0; index < testChannels.length; index++) {
-      const channelName = testChannels[index]
-      await client.join(channelName)
-      console.log('Twitch: Joined', channelName)
-    }
   })
 
   client.on('close', err => {
@@ -64,6 +72,10 @@ async function initialize ({ messageClient, eventClient }, testChannels, isDebug
   eventClient.on('keepTwitchData', data => {
     if (data.twitch) events.push(data.twitch)
     else if (data.twitchOfflineBatch) events.push(...data.twitchOfflineBatch)
+  })
+
+  messageClient.on('newStreamer', data => {
+    if (data.platform === 'TWITCH') addNewStreamer(data)
   })
 
   client.connect()

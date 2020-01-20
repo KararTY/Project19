@@ -1,14 +1,37 @@
 'use strict'
 
+const moment = require('moment')
+const fetch = require('node-fetch')
+
 const blacklist = require('../Utilities/blacklist')
 const ParsedMessage = require('../Utilities/parsedMessage')
-const moment = require('moment')
+const Helpers = use('Service/Helpers')
 
 const Logger = use('Logger')
+const StreamEvent = use('App/Models/StreamEvent')
+const User = use('App/Models/User')
+
+const Env = use('Env')
 
 class Twitch {
   constructor (Config) {
     this.Config = Config || {}
+    this.timerTime = Number(this.Config.get('logs.writeTimer'))
+    this.streams = []
+
+    this.defaultHeaders = new fetch.Headers({
+      'Client-ID': Env.get('TWITCH_CLIENT_ID')
+    })
+
+    this.timer = () => setTimeout(async () => {
+      const length = await this.updateStreams()
+
+      Logger.info(`[Twitch] Updated ${length} streams.`)
+
+      this.timer()
+    }, typeof this.timerTime === 'number' ? this.timerTime : (1000 * 60) * 5)
+
+    this.timer()
   }
 
   /**
@@ -54,7 +77,7 @@ class Twitch {
       if (badge.name === 'subscriber') {
         const subBadge = json.badgeInfo.find(b => b.name === 'subscriber')
         if (subBadge) parsedMessage.subscribedFor = subBadge.version
-        else Logger.warn(`[Twitch] Unknown badge found, ${JSON.stringify(badge, null, 2)}`)
+        else Logger.warning(`[Twitch] Unknown badge found, ${JSON.stringify(badge, null, 2)}`)
       }
       parsedMessage.badges.push(badge.name)
     }
@@ -164,7 +187,7 @@ class Twitch {
       // case 'submysterygift':
       // case 'rewardgift':
       default:
-        console.error('#### UNHANDLED EVENT messagetype!', json)
+        Logger.warning('[Twitch] Unhandled messageType! %j', json)
         parsedMessage.event = {
           type: json.messageTypeID
         }
@@ -178,6 +201,50 @@ class Twitch {
 
   displayEvent (parsedEvent) {
     return `[${parsedEvent.timestamp.format('HH:mm')}] ${parsedEvent.systemMessage}`
+  }
+
+  async updateStreams () {
+    const userQuery = await User.query().where('platform', 'TWITCH').where('track', true).fetch()
+    const streamNames = userQuery.toJSON().map(user => user.name)
+
+    const batches = Helpers.chunks(streamNames, 100)
+    const resData = []
+    for (let index = 0; index < batches.length; index++) {
+      const batch = batches[index]
+      const request = await fetch(`https://api.twitch.tv/helix/streams?${batch.map((i, ind) => ind > 0 ? '&user_login=' + i : 'user_login=' + i).join('')}`, { headers: this.defaultHeaders })
+      const response = await request.json()
+
+      if (!response.error) resData.push(...response.data)
+    }
+
+    this.streams = this.streams.filter(i => resData.map(i => i.user_name).includes(i.name))
+
+    for (let index = 0; index < resData.length; index++) {
+      const stream = resData[index]
+
+      const streamParsed = {
+        id: stream.user_id,
+        name: stream.user_name.replace(/ /g, '').toLowerCase(),
+        gameID: stream.game_id,
+        thumbnail: stream.thumbnail_url.replace('{width}x{height}', '1920x1080'),
+        type: stream.type,
+        title: stream.title,
+        viewers: stream.viewer_count,
+        started: stream.started_at
+      }
+
+      const streamInArr = this.streams.findIndex(i => i.name === streamParsed.name)
+      if (streamInArr >= 0) this.streams[streamInArr] = streamParsed
+      else this.streams.push(streamParsed)
+
+      const streamEvent = new StreamEvent()
+      streamEvent.userid = `t-${streamParsed.id}`
+      streamEvent.event_name = 'viewers'
+      streamEvent.event_value = String(streamParsed.viewers)
+      await streamEvent.save()
+    }
+
+    return Promise.resolve(this.streams.length)
   }
 }
 

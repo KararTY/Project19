@@ -16,3 +16,4 @@
 require('./routes/index') // domain/
 require('./routes/live') // domain/live
 require('./routes/logs') // domain/logs
+require('./routes/stats') // domain/stats

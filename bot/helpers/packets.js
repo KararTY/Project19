@@ -15,6 +15,7 @@ module.exports = (topic) => {
     isJoinAck: (packet) => wsp.isJoinAckPacket(JSON.parse(packet)),
     isOpen: (packet) => wsp.isOpenPacket(JSON.parse(packet)),
     isPong: (packet) => wsp.isPongPacket(JSON.parse(packet)),
+    isEvent: (packet) => wsp.isEventPacket(JSON.parse(packet)),
     ping: wsp.pingPacket(),
     wsp: wsp
   }

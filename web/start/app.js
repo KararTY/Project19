@@ -21,7 +21,9 @@ const providers = [
   path.join(__dirname, '..', 'providers', 'TwitchProvider'),
   path.join(__dirname, '..', 'providers', 'MixerProvider'),
   path.join(__dirname, '..', 'providers', 'LogsProvider'),
-  path.join(__dirname, '..', 'providers', 'DbProvider')
+  path.join(__dirname, '..', 'providers', 'DbProvider'),
+  path.join(__dirname, '..', 'providers', 'HelpersProvider'),
+  path.join(__dirname, '..', 'providers', 'SocketProvider')
 ]
 
 /*

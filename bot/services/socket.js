@@ -41,7 +41,10 @@ class Client {
     this.events.on('socketMessage', data => {
       if (this.isDebug) console.log('Socket:', JSON.parse(data))
 
-      if (this.packets.isOpen(data)) {
+      if (this.packets.isEvent(data)) {
+        data = JSON.parse(data).d.data
+        if (data.newStreamer) this.events.emit('newStreamer', data.newStreamer)
+      } else if (this.packets.isOpen(data)) {
         this.socketSettings = JSON.parse(data).d
         // Start pinging server to stay alive.
         this.timer = setInterval(() => {

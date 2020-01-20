@@ -39,16 +39,16 @@ Route.route('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ pa
   let channelName
   if (params.channelname) {
     channelName = params.channelname.toLowerCase()
-    channel = await User.query().where('name', channelName).where('platform', platform.toUpperCase()).fetch()
-    channel = channel.toJSON()[0]
+    const channelQuery = await User.query().where('name', channelName).where('platform', platform.toUpperCase()).fetch()
+    if (channelQuery.rows.length) channel = channelQuery.toJSON()[0]
     if (!channel) throw new ChannelNotFoundException()
   }
 
   let user
   if (params.username) {
     const userName = params.username.toLowerCase()
-    user = await User.query().where('name', userName).where('platform', platform.toUpperCase()).fetch()
-    user = user.toJSON()[0]
+    const userQuery = await User.query().where('name', userName).where('platform', platform.toUpperCase()).fetch()
+    if (userQuery.rows.length) user = userQuery.toJSON()[0]
     if (!user) throw new UserNotFoundException()
   }
 

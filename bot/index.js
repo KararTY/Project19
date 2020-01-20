@@ -3,11 +3,6 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') })
 const isDebug = process.env.NODE_ENV !== 'production'
 
-const testChannels = {
-  twitch: ['notkarar', 'forsen', 'drdisrespect', 'xqcow', 'mizkif', 'pajlada', 'nymn', 'riotgames', 'esl_csgo'],
-  mixer: ['frozen-bags', 'shroud', 'ninja', 'kinggothalion']
-}
-
 const helper = require('./helpers/message')
 const Client = require('./services/socket')
 
@@ -98,8 +93,8 @@ eventClient.events.on('event', data => {
   }
 })
 
-require('./services/twitch')({ messageClient: messageClient.events, eventClient: eventClient.events }, testChannels.twitch, isDebug)
-require('./services/mixer')({ messageClient: messageClient.events, eventClient: eventClient.events }, testChannels.mixer, isDebug)
+require('./services/twitch')({ messageClient: messageClient.events, eventClient: eventClient.events }, isDebug)
+require('./services/mixer')({ messageClient: messageClient.events, eventClient: eventClient.events }, isDebug)
 
 messageClient.start()
 eventClient.start()

@@ -189,8 +189,8 @@ function inputLogs () {
 async function liveChat (el, platform, channel) {
   if (channel) {
     render(el, html`
+      <h1>${channel.toUpperCase()} <span class="is-size-6" id="connection" ></span></h1>
       <div id="siteloading" class="loader-wrapper">
-        <div id="connection" class="loader-line loader-animate"></div>
         <div id="chat" class="chat loader-line loader-animate"></div>
       </div>
     `)
@@ -208,7 +208,8 @@ async function logs (el, platform, timestamp, channel, user) {
     if (response.status === 200) {
       const logFile = await response.text()
       render(el, html`
-        <p><a href="${window.location.href}?format=plain">Click here, or add <span>?format=plain</span> to current url, to only see logs.</a></p>
+        <h1>${channel.toUpperCase()} <span class="is-size-6">logs for <span title="All timestamps are in UTC +0.">${timestamp}</span></span></h1>
+        <p><a onclick="${() => { const newUrl = new URL(window.location); newUrl.searchParams.append('format', 'plain'); window.location = newUrl }}">Click here, or add <span>?format=plain</span> to current url, to only see logs.</a></p>
         <div class="logs">${logFile}</div>
       `)
       return true

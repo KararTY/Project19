@@ -9,19 +9,22 @@ class ChatUpdateController {
     this.socket = socket
     this.request = request
 
+    this.newConnection(socket)
+  }
+
+  async newConnection (socket) {
     if (socket.topic) {
       const parsedTopic = socket.topic.match(/:([\w]+)\.([\w]+)/)
       const platform = parsedTopic[1].toUpperCase()
       const channelName = parsedTopic[2].toLowerCase()
 
       if (platform && channelName) {
-        User.query().where('name', channelName).where('platform', platform).fetch().then(res => {
-          if (!res.rows.length) {
-            const err = new ChannelNotFoundException()
-            socket.emit('error', { code: err.code, message: err.message })
-            socket.close()
-          }
-        })
+        const channelQuery = await User.query().where('name', channelName).where('platform', platform).fetch()
+        if (channelQuery.rows.length === 0) {
+          const err = new ChannelNotFoundException()
+          socket.emit('error', { code: err.code, message: err.message })
+          socket.close()
+        }
       }
     }
   }

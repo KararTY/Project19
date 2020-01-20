@@ -17,8 +17,27 @@ client.use(new Mixer.OAuthProvider(client, {
   }
 }))
 
-async function initialize ({ messageClient, eventClient }, testChannels, isdebug) {
+async function initialize ({ messageClient, eventClient }, isdebug) {
   isDebug = isdebug
+  const streamers = []
+
+  async function addNewStreamer (user) {
+    if (streamers.includes(user.name)) {
+      console.log('Mixer: Already added streamer. Skipping.')
+    } else {
+      try {
+        const channelData = await client.request('GET', `/channels/${user.name}`)
+
+        // Our chat connection details.
+        const channel = await new Mixer.ChatService(client).join(channelData.body.id)
+        await createChatSocket(channelData, channel, { messageClient, eventClient })
+        streamers.push(user.name)
+      } catch (err) {
+        console.error('Mixer: Something went wrong.')
+        console.error('Mixer:', err)
+      }
+    }
+  }
 
   messageClient.on('socketJoinAck', topic => {
     if (topic === messageClient.socket.topic) {
@@ -48,22 +67,9 @@ async function initialize ({ messageClient, eventClient }, testChannels, isdebug
     else if (data.mixerOfflineBatch) events.push(...data.mixerOfflineBatch)
   })
 
-  try {
-    // Loop all requested channels, as each channel requires a separate websocket connection.
-    for (let index = 0; index < testChannels.length; index++) {
-      const channelName = testChannels[index]
-
-      const channelData = await client.request('GET', `/channels/${channelName}`)
-      // Our chat connection details.
-      const channel = await new Mixer.ChatService(client).join(channelData.body.id)
-
-      // if (isDebug) console.log('Mixer:', channel)
-      await createChatSocket(channelData, channel, { messageClient, eventClient })
-    }
-  } catch (err) {
-    console.error('Mixer: Something went wrong.')
-    console.error('Mixer:', err)
-  }
+  messageClient.on('newStreamer', data => {
+    if (data.platform === 'MIXER') addNewStreamer(data)
+  })
 }
 
 /**

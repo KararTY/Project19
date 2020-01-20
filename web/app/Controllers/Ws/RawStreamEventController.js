@@ -22,7 +22,7 @@ class RawStreamEventController {
     const platformName = (twitch || twitchOfflineBatch) ? 'twitch' : (mixer || mixerOfflineBatch) ? 'mixer' : false
 
     if (twitch || mixer) {
-      const topicString = `streamevent:${platformName}.${twitch ? twitch.channelName : mixer.token}`
+      const topicString = `chat:${platformName}.${twitch ? twitch.channelName : mixer.token}`
       const PlatformEvent = twitch ? Twitch : mixer ? Mixer : false
       const eventObject = twitch || mixer
 
@@ -38,7 +38,7 @@ class RawStreamEventController {
 
         if (!json.blacklisted) {
           Logger.debug(`[RawStreamEventController] <${platformName.toUpperCase()}> event received: ${message}`)
-          const channel = Ws.getChannel('streamevent:*').topic(topicString)
+          const channel = Ws.getChannel('chat:*').topic(topicString)
           if (channel) channel.broadcast('message', message)
         }
 
@@ -51,8 +51,7 @@ class RawStreamEventController {
         streamEvent.event_value = json.importantValue
         await streamEvent.save()
       } catch (err) {
-        console.error(err)
-        Logger.debug('Error', err)
+        Logger.error('[RawStreamEventController] Error %j', err)
       }
     } else if (twitchOfflineBatch || mixerOfflineBatch) {
       const PlatformEvent = twitchOfflineBatch ? Twitch : mixerOfflineBatch ? Mixer : false
@@ -76,8 +75,7 @@ class RawStreamEventController {
           streamEvent.event_value = json.importantValue
           await streamEvent.save()
         } catch (err) {
-          console.error(err)
-          Logger.debug('Error', err)
+          Logger.error('[RawStreamEventController]  Error %j', err)
         }
       }
     }
