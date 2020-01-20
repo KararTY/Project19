@@ -1,8 +1,7 @@
 'use strict'
 
 class Helpers {
-// https://stackoverflow.com/a/55435856
-
+  // https://stackoverflow.com/a/55435856
   chunks (arr, n) {
     function * ch (arr, n) {
       for (let i = 0; i < arr.length; i += n) {

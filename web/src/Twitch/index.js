@@ -5,9 +5,11 @@ const fetch = require('node-fetch')
 
 const blacklist = require('../Utilities/blacklist')
 const ParsedMessage = require('../Utilities/parsedMessage')
-const Helpers = use('Service/Helpers')
 
 const Logger = use('Logger')
+
+const Helpers = use('Service/Helpers')
+
 const StreamEvent = use('App/Models/StreamEvent')
 const User = use('App/Models/User')
 

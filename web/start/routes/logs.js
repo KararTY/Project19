@@ -40,7 +40,7 @@ Route.route('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ pa
   if (params.channelname) {
     channelName = params.channelname.toLowerCase()
     const channelQuery = await User.query().where('name', channelName).where('platform', platform.toUpperCase()).fetch()
-    if (channelQuery.rows.length) channel = channelQuery.toJSON()[0]
+    if (channelQuery.rows.length > 0) channel = channelQuery.toJSON()[0]
     if (!channel) throw new ChannelNotFoundException()
   }
 
@@ -48,7 +48,7 @@ Route.route('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ pa
   if (params.username) {
     const userName = params.username.toLowerCase()
     const userQuery = await User.query().where('name', userName).where('platform', platform.toUpperCase()).fetch()
-    if (userQuery.rows.length) user = userQuery.toJSON()[0]
+    if (userQuery.rows.length > 0) user = userQuery.toJSON()[0]
     if (!user) throw new UserNotFoundException()
   }
 
@@ -56,7 +56,7 @@ Route.route('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ pa
   if ((channel && method === 'POST') || (format && format === 'plain')) logFile = await Logs.readLog({ channel: channel, platform, timestamp: moment(timestamp) }, user || undefined)
 
   if (method === 'POST') {
-    if (logFile && logFile.length) return logFile
+    if (logFile && logFile.length > 0) return logFile
     else throw new LogsNotFoundException()
   } else {
     return view.render((format && format === 'plain')

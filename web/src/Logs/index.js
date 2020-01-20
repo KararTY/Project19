@@ -26,7 +26,7 @@ class Logs {
       const tempQueueLen = Number(this.queue.length)
       this.queue = []
 
-      if (tempQueue.length) {
+      if (tempQueue.length > 0) {
         const objects = Object.keys(this.streams)
 
         for (let i = 0; i < objects.length; i++) {

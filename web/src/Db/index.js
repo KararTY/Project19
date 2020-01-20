@@ -15,7 +15,7 @@ class Database {
       const tempQueue = [...this.queue]
       this.queue = []
 
-      if (tempQueue.length) {
+      if (tempQueue.length > 0) {
         const arr = []
         let counter = 0
 
