@@ -18,7 +18,7 @@ const Env = use('Env')
 class Twitch {
   constructor (Config) {
     this.Config = Config || {}
-    this.timerTime = Number(this.Config.get('logs.writeTimer'))
+    this.updateTimer = Number(this.Config.get('twitch.updateTimer'))
     this.streams = []
 
     this.defaultHeaders = new fetch.Headers({
@@ -31,7 +31,7 @@ class Twitch {
       Logger.info(`[Twitch] Updated ${length} streams.`)
 
       this.timer()
-    }, typeof this.timerTime === 'number' ? this.timerTime : (1000 * 60) * 5)
+    }, typeof this.updateTimer === 'number' ? this.updateTimer : (1000 * 60) * 5)
 
     this.timer()
   }

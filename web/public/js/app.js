@@ -3,6 +3,8 @@ const { html, render } = window.lighterhtml
 const url = new URL(window.location)
 const currentFullPathArray = url.pathname.slice(1).split('/')
 
+const chartData = {}
+
 async function getPath (fullPathArray) {
   const currentPath = fullPathArray[0]
   switch (currentPath) {
@@ -31,12 +33,23 @@ async function getPath (fullPathArray) {
       }
       break
     }
+    case 'stats': {
+      const canvas = document.querySelector('canvas')
+      const id = canvas.id
+      const platform = fullPathArray[1]
+      const channel = fullPathArray[2]
+      const rendered = await chart(canvas, id, platform, channel)
+      if (!rendered) {
+
+      }
+      break
+    }
     default: {
-      const generalChart = document.getElementById('generalChart')
+      const topChart = document.getElementById('top')
       let chart
-      if (generalChart && window.Chart) {
+      if (topChart && window.Chart) {
         window.Chart.platform.disableCSSInjection = true
-        chart = new window.Chart(generalChart.getContext('2d'), {
+        chart = new window.Chart(topChart.getContext('2d'), {
           type: 'bar',
           data: {
             labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
@@ -208,18 +221,62 @@ async function logs (el, platform, timestamp, channel, user) {
     if (response.status === 200) {
       const logFile = await response.text()
       render(el, html`
-        <h1>${channel.toUpperCase()} <span class="is-size-6">logs for <span title="All timestamps are in UTC +0.">${timestamp}</span></span></h1>
+        <h1>${channel.toUpperCase()} <span class="is-size-6">${user ? user.toUpperCase() + ' ' : ''}logs for <span title="All timestamps are in UTC +0.">${timestamp}</span></span></h1>
         <p><a onclick="${() => { const newUrl = new URL(window.location); newUrl.searchParams.append('format', 'plain'); window.location = newUrl }}">Click here, or add <span>?format=plain</span> to current url, to only see logs.</a></p>
         <div class="logs">${logFile}</div>
       `)
       return true
     } else {
-      const error = await response.json()
-      window.alert(`Error ${error.message}`)
-      if (new URL(window.location).searchParams.has('redirect')) window.history.back()
+      try {
+        const error = await response.json()
+        window.alert(`Error ${error.message}`)
+        if (new URL(window.location).searchParams.has('redirect')) window.history.back()
+      } catch (e) {
+        window.alert(`Server returned ${response.status}: ${response.statusText}`)
+      }
     }
   }
   return false
+}
+
+async function chart (el, id, platform, channel) {
+  if (id.split('.')[0] === 'chart') {
+    const response = await fetch(window.location.href, { method: 'POST' })
+    if (response.status === 200) {
+      const data = await response.json()
+      window.Chart.platform.disableCSSInjection = true
+      chartData[id] = {
+        chart: null,
+        data
+      }
+      chartData[id].chart = new window.Chart(el.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: data.map(i => new Date(i.time).toLocaleTimeString()),
+          datasets: [{
+            label: 'Viewers',
+            data: data.map(i => i.value)
+          }]
+        },
+        options: {
+          tooltips: {
+            callbacks: {
+              title: function (tooltip) {
+                return new Date(chartData[this._chart.canvas.id].data[tooltip[0].index].time).toUTCString()
+              }
+            }
+          }
+        }
+      })
+    } else {
+      try {
+        const error = await response.json()
+        window.alert(`Error ${error.message}`)
+      } catch (e) {
+        window.alert(`Server returned ${response.status}: ${response.statusText}`)
+      }
+    }
+  }
 }
 
 Promise.all([getPath(currentFullPathArray)]).then(rs => rs.forEach(r => console.log(r)))

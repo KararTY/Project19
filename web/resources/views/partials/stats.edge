@@ -1,0 +1,6 @@
+@component('components.card')
+  @slot('content')
+    @!component('components.chart', id = web.chart)
+  @endslot
+@endcomponent
+{{ script('/js/Chart.min@2.9.3.js') }}

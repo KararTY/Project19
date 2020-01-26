@@ -63,7 +63,7 @@ Route.route('/logs/:platform?/:timestamp?/:channelname?/:username?', async ({ pa
       ? 'partials.logs-plain'
       : 'core.template', {
       web: {
-        title: `Logs${channelName ? ` - ${channelName.toUpperCase()}` : ''}${timestamp ? ` - ${timestamp}` : ''}`,
+        title: `Logs${channelName ? ` - ${channelName.toUpperCase()}` : ''}${user ? ` ${user.name.toUpperCase()} ` : ''}${timestamp ? ` - ${timestamp}` : ''}`,
         template: 'partials.logs',
         navbarActive: 'logs',
         logFile: logFile || new LogsNotFoundException()

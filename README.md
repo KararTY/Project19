@@ -1,7 +1,7 @@
 # Project19
 Chat bot with Web UI. Challenge for the holidays.
 
-## WORK IN PROGRESS v0.1.4
+## WORK IN PROGRESS v0.2.0
 Since the project is still a work in progress, all updates will most likely introduce breaking changes. This is not a production-ready project.
 
 ## Technologies
@@ -55,6 +55,9 @@ Since the project is still a work in progress, all updates will most likely intr
   * Login system in Web UI.
     * Twitch oauth.
     * Does Mixer have auth support?
+
+## Features for the future
+  * Use a text compression algorithm for logging, maybe Huffman coding?
 
 ## ISC License
 See [LICENSE](LICENSE). Karar Al-Remahy
