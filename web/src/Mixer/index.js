@@ -31,7 +31,7 @@ class Mixer {
     let plainText
     if (json.message) {
       plainText = json.message.message.map(message => message.text || '').join('')
-      if (json.message.meta.me) parsedMessage.action = true
+      if (json.message.meta && json.message.meta.me) parsedMessage.action = true
     }
 
     parsedMessage.blacklisted = await blacklist(plainText)
