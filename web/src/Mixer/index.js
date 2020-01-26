@@ -82,7 +82,7 @@ class Mixer {
       currency: json.skill.currency
     }
 
-    parsedMessage.importantValue = parsedMessage.event.name
+    parsedMessage.importantValue = parsedMessage.event.cost
 
     return parsedMessage
   }

@@ -185,7 +185,14 @@ class Twitch {
         }
         parsedMessage.importantValue = parsedMessage.event.threshold
         break
-      // case 'submysterygift':
+      case 'submysterygift':
+        parsedMessage.event = {
+          type: json.messageTypeID,
+          amount: json.eventParams.massGiftCount,
+          subPlan: json.eventParams.subPlan
+        }
+        parsedMessage.importantValue = parsedMessage.event.amount
+        break
       // case 'rewardgift':
       default:
         Logger.warning('[Twitch] Unhandled messageType! %j', json)
