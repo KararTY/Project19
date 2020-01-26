@@ -1,9 +1,22 @@
+'use strict'
+
 const { html, render } = window.lighterhtml
 
 const url = new URL(window.location)
 const currentFullPathArray = url.pathname.slice(1).split('/')
 
 const chartData = {}
+
+const colors = {
+  malachite: '#0CCA4A',
+  northTexasGreen: '#099336',
+  onyx: '#3C3744',
+  gunMetal: '#292F36',
+  smokyBlack: '#0A0908',
+  quartz: '#4D4955',
+  whiteSmoke: '#F6F7F7',
+  platinum: '#E0E1E1'
+}
 
 async function getPath (fullPathArray) {
   const currentPath = fullPathArray[0]
@@ -34,57 +47,25 @@ async function getPath (fullPathArray) {
       break
     }
     case 'stats': {
-      const canvas = document.querySelector('canvas')
-      const id = canvas.id
+      const canvasEl = document.querySelector('canvas')
+      const id = canvasEl.id
       const platform = fullPathArray[1]
       const channel = fullPathArray[2]
-      const rendered = await chart(canvas, id, platform, channel)
+      const rendered = await chart(canvasEl, id, platform, channel)
       if (!rendered) {
 
       }
       break
     }
     default: {
-      const topChart = document.getElementById('top')
-      let chart
-      if (topChart && window.Chart) {
+      const canvasEl = document.querySelector('canvas')
+      if (canvasEl) {
+        const id = canvasEl.id
         window.Chart.platform.disableCSSInjection = true
-        chart = new window.Chart(topChart.getContext('2d'), {
-          type: 'bar',
-          data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-              label: '# of Votes',
-              data: [12, 19, 3, 5, 2, 3],
-              backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-              ],
-              borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-              ],
-              borderWidth: 1
-            }]
-          },
-          options: {
-            scales: {
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true
-                }
-              }]
-            }
-          }
-        })
+        chartData[id] = {
+          chart: null
+        }
+        chartData[id].chart = new window.Chart(canvasEl.getContext('2d'))
       }
       break
     }
@@ -243,22 +224,47 @@ async function chart (el, id, platform, channel) {
   if (id.split('.')[0] === 'chart') {
     const response = await fetch(window.location.href, { method: 'POST' })
     if (response.status === 200) {
-      const data = await response.json()
+      const data = (await response.json()).sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime())
       window.Chart.platform.disableCSSInjection = true
       chartData[id] = {
         chart: null,
         data
       }
+
       chartData[id].chart = new window.Chart(el.getContext('2d'), {
         type: 'line',
         data: {
           labels: data.map(i => new Date(i.time).toLocaleTimeString()),
           datasets: [{
             label: 'Viewers',
+            borderColor: colors.malachite,
+            backgroundColor: colors.onyx,
             data: data.map(i => i.value)
           }]
         },
         options: {
+          title: {
+            display: true,
+            text: 'Viewers',
+            fontColor: colors.platinum,
+            fontSize: 16
+          },
+          legend: {
+            display: false
+          },
+          scales: {
+            xAxes: [{
+              ticks: {
+                fontColor: colors.platinum
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                fontColor: colors.whiteSmoke
+              }
+            }]
+          },
           tooltips: {
             callbacks: {
               title: function (tooltip) {
@@ -268,6 +274,11 @@ async function chart (el, id, platform, channel) {
           }
         }
       })
+
+      const titleHTML = html.node`
+        <h1 class="title is-marginless">${channel.toUpperCase()} <span class="is-size-6">${platform.toUpperCase()}</span></h1>
+      `
+      el.parentElement.prepend(titleHTML)
     } else {
       try {
         const error = await response.json()

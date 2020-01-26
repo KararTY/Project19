@@ -86,6 +86,7 @@ async function createChatSocket (channelData, channel, { messageClient, eventCli
 
   const socket = new Mixer.Socket(ws, endpoints).boot()
   socket.__token = token
+  socket.__id = channelId
 
   // if (isDebug) console.log('Mixer:', userId, channelId, endpoints, authkey)
 
@@ -110,7 +111,7 @@ async function createChatSocket (channelData, channel, { messageClient, eventCli
 
     socket.on('SkillAttribution', event => {
       event.token = socket.__token.toLowerCase()
-
+      event.channel = socket.__id
       if (isDebug) console.log(`Mixer Event: #${event.token} ${event.user_name}: Executed [${event.skill.skill_name}] for ${event.skill.cost} ${event.skill.currency}.`)
 
       if (String(eventClient.socket.socket.readyState) === '1') eventClient.emit('event', { mixer: event })

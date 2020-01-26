@@ -7,13 +7,12 @@ const blacklist = require('../Utilities/blacklist')
 const ParsedMessage = require('../Utilities/parsedMessage')
 
 const Logger = use('Logger')
+const Env = use('Env')
 
 const Helpers = use('Service/Helpers')
 
 const StreamEvent = use('App/Models/StreamEvent')
 const User = use('App/Models/User')
-
-const Env = use('Env')
 
 class Twitch {
   constructor (Config) {
@@ -79,7 +78,6 @@ class Twitch {
       if (badge.name === 'subscriber') {
         const subBadge = json.badgeInfo.find(b => b.name === 'subscriber')
         if (subBadge) parsedMessage.subscribedFor = subBadge.version
-        else Logger.warning(`[Twitch] Unknown badge found, ${JSON.stringify(badge, null, 2)}`)
       }
       parsedMessage.badges.push(badge.name)
     }
@@ -155,6 +153,7 @@ class Twitch {
         break
       case 'giftpaidupgrade':
       case 'anongiftpaidupgrade':
+      case 'primepaidupgrade':
         parsedMessage.event = {
           type: json.messageTypeID,
           promoGiftTotal: json.eventParams.promoGiftTotal,

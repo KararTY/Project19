@@ -105,7 +105,8 @@ class Database {
           }
         }
       } catch (err) {
-        Logger.error('[Db] Error %j %j', err, request)
+        Logger.error('[Db] Error %j', request)
+        console.error(err)
       }
     }
 

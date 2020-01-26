@@ -1,3 +1,5 @@
+'use strict'
+
 /* global adonis */
 let ws = null
 

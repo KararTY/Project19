@@ -26,9 +26,13 @@ class Mixer {
    * @param {String} json.id
    */
   async parseMessage (json) {
-    const plainText = json.message.message.map(message => message.text || '').join('')
-
     const parsedMessage = new ParsedMessage('mixer')
+
+    let plainText
+    if (json.message) {
+      plainText = json.message.message.map(message => message.text || '').join('')
+      if (json.message.meta.me) parsedMessage.action = true
+    }
 
     parsedMessage.blacklisted = await blacklist(plainText)
 
@@ -48,8 +52,6 @@ class Mixer {
     parsedMessage.message = plainText
 
     parsedMessage.badges = json.user_roles
-
-    if (json.message.meta.me) parsedMessage.action = true
 
     return parsedMessage
   }
@@ -79,6 +81,8 @@ class Mixer {
       cost: json.skill.cost,
       currency: json.skill.currency
     }
+
+    parsedMessage.importantValue = parsedMessage.event.name
 
     return parsedMessage
   }

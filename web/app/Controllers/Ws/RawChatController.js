@@ -40,7 +40,8 @@ class RawChatController {
         Logs.queueWrite({ channel: json.channel, platform: json.platform, timestamp: json.timestamp, author: json.author }, message)
         Db.queueUser(json)
       } catch (err) {
-        Logger.error('[RawChatController] Error %j', err)
+        Logger.error('[RawChatController] Error')
+        console.error(err)
       }
     } else if (twitchOfflineBatch || mixerOfflineBatch) {
       const PlatformMessage = twitchOfflineBatch ? Twitch : mixerOfflineBatch ? Mixer : false
@@ -58,7 +59,8 @@ class RawChatController {
           Logs.queueWrite({ channel: json.channel, platform: json.platform, timestamp: json.timestamp, author: json.author }, message)
           Db.queueUser(json)
         } catch (err) {
-          Logger.error('[RawChatController] Error %j', err)
+          Logger.error('[RawChatController] Error')
+          console.error(err)
         }
       }
     }

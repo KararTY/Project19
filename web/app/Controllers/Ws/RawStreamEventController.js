@@ -47,11 +47,12 @@ class RawStreamEventController {
 
         const streamEvent = new StreamEvent()
         streamEvent.userid = `${platformName.charAt(0)}-${json.channel.id}`
-        streamEvent.event_name = json.event.type
+        streamEvent.event_name = json.event.type || json.event.currency
         streamEvent.event_value = json.importantValue
         await streamEvent.save()
       } catch (err) {
-        Logger.error('[RawStreamEventController] Error %j', err)
+        Logger.error('[RawStreamEventController] Error')
+        console.error(err)
       }
     } else if (twitchOfflineBatch || mixerOfflineBatch) {
       const PlatformEvent = twitchOfflineBatch ? Twitch : mixerOfflineBatch ? Mixer : false
@@ -75,7 +76,8 @@ class RawStreamEventController {
           streamEvent.event_value = json.importantValue
           await streamEvent.save()
         } catch (err) {
-          Logger.error('[RawStreamEventController]  Error %j', err)
+          Logger.error('[RawStreamEventController]  Error')
+          console.error(err)
         }
       }
     }
