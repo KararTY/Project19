@@ -3,7 +3,7 @@ Chat bot with Web UI. Challenge for the holidays.
 
 <p align="center">
   <img height="500" src="https://i.imgur.com/W7W7T8J.png">
-  <br>Project 19 web
+  <br>Project 19 web, click for a higher resolution picture.
 </p>
 
 ## WORK IN PROGRESS v0.3.5
