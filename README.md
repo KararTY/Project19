@@ -1,6 +1,11 @@
 # Project19
 Chat bot with Web UI. Challenge for the holidays.
 
+<p align="center">
+  <img height="500" src="https://i.imgur.com/W7W7T8J.png">
+  <br>Project 19 web
+</p>
+
 ## WORK IN PROGRESS v0.3.5
 Since the project is still a work in progress, all updates will most likely introduce breaking changes. This is not a production-ready project.
 
