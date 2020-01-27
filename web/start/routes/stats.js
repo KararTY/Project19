@@ -9,14 +9,37 @@ const ChannelNotFoundException = use('App/Exceptions/ChannelNotFoundException')
 const User = use('App/Models/User')
 const StreamEvent = use('App/Models/StreamEvent')
 
+const topStreams = {
+  nextUpdate: new Date(),
+  streams: []
+}
+
 Route.route('/stats/:platform?/:channelname?', async ({ params, request, response, view }) => {
   const method = request.method()
 
   let platform
   if (params.platform) {
-    platform = params.platform.toLowerCase()
+    if (params.platform === 'top' && method === 'POST') {
+      // Get top
+      if (topStreams.nextUpdate.getTime() < new Date().getTime()) {
+        const streams = []
+        for (let i = 0; i < 3; i++) {
+          const topTwitchStreamer = await StreamEvent.findBy('event_name', `twitch-top-${i}`)
+          const topMixerStreamer = await StreamEvent.findBy('event_name', `mixer-top-${i}`)
+          if (topTwitchStreamer) streams.push({ platform: 'TWITCH', viewers: topTwitchStreamer.event_value, time: topTwitchStreamer.updated_at, thumbnail: topTwitchStreamer.event_extra.thumbnail, name: topTwitchStreamer.event_extra.name })
+          if (topMixerStreamer) streams.push({ platform: 'MIXER', viewers: topMixerStreamer.event_value, time: topMixerStreamer.updated_at, thumbnail: topMixerStreamer.event_extra.thumbnail, name: topMixerStreamer.event_extra.name })
+        }
 
-    if (!['mixer', 'twitch'].includes(platform)) throw new PlatformNotFoundException()
+        topStreams.nextUpdate = new Date(new Date().getTime() + ((1000 * 60) * 5))
+        topStreams.streams = streams
+      }
+
+      return topStreams.streams
+    } else {
+      platform = params.platform.toLowerCase()
+
+      if (!['mixer', 'twitch'].includes(platform)) throw new PlatformNotFoundException()
+    }
   }
 
   let channel

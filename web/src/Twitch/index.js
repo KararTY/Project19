@@ -1,15 +1,13 @@
 'use strict'
 
-const moment = require('moment')
 const fetch = require('node-fetch')
 
 const blacklist = require('../Utilities/blacklist')
-const ParsedMessage = require('../Utilities/parsedMessage')
 
 const Logger = use('Logger')
 const Env = use('Env')
 
-const Helpers = use('Service/Helpers')
+const { chunks, ParsedMessage } = use('Service/Helpers')
 
 const StreamEvent = use('App/Models/StreamEvent')
 const User = use('App/Models/User')
@@ -18,10 +16,12 @@ class Twitch {
   constructor (Config) {
     this.Config = Config || {}
     this.updateTimer = Number(this.Config.get('twitch.updateTimer'))
+    this.enabled = this.Config.get('twitch.enabled')
     this.streams = []
 
     this.defaultHeaders = new fetch.Headers({
-      'Client-ID': Env.get('TWITCH_CLIENT_ID')
+      'Client-ID': Env.get('TWITCH_CLIENT_ID'),
+      'User-Agent': 'Project-19/Nodejs github.com/kararty/project19'
     })
 
     this.timer = () => setTimeout(async () => {
@@ -32,7 +32,7 @@ class Twitch {
       this.timer()
     }, typeof this.updateTimer === 'number' ? this.updateTimer : (1000 * 60) * 5)
 
-    this.timer()
+    if (this.enabled) this.timer()
   }
 
   /**
@@ -54,7 +54,9 @@ class Twitch {
    * @param {Number} json.senderUserID
    */
   async parseMessage (json) {
-    const parsedMessage = new ParsedMessage('twitch')
+    if (!this.enabled) return
+
+    const parsedMessage = ParsedMessage('twitch')
 
     // TODO: TWITCH USERNAME CHECK?
     if (json.messageText) parsedMessage.blacklisted = await blacklist(json.messageText)
@@ -84,7 +86,7 @@ class Twitch {
 
     parsedMessage.emotes = json.emotes
 
-    parsedMessage.timestamp = moment(json.serverTimestamp).utc()
+    parsedMessage.timestamp = parsedMessage.setTimestamp(json.serverTimestamp)
 
     if (json.color) parsedMessage.color = json.color
 
@@ -121,6 +123,8 @@ class Twitch {
    * @param {String} json.systemMessage
    */
   async parseEvent (json) {
+    if (!this.enabled) return
+
     const parsedMessage = await this.parseMessage(json)
 
     switch (json.messageTypeID) {
@@ -215,7 +219,7 @@ class Twitch {
     const userQuery = await User.query().where('platform', 'TWITCH').where('track', true).fetch()
     const streamNames = userQuery.toJSON().map(user => user.name)
 
-    const batches = Helpers.chunks(streamNames, 100)
+    const batches = chunks(streamNames, 100)
     const resData = []
     for (let index = 0; index < batches.length; index++) {
       const batch = batches[index]
@@ -225,8 +229,13 @@ class Twitch {
       if (!response.error) resData.push(...response.data)
     }
 
+    resData.sort((a, b) => {
+      return b.viewer_count - a.viewer_count
+    })
+
     this.streams = this.streams.filter(i => resData.map(i => i.user_name).includes(i.name))
 
+    const streams = []
     for (let index = 0; index < resData.length; index++) {
       const stream = resData[index]
 
@@ -241,6 +250,8 @@ class Twitch {
         started: stream.started_at
       }
 
+      streams.push(streamParsed)
+
       const streamInArr = this.streams.findIndex(i => i.name === streamParsed.name)
       if (streamInArr >= 0) this.streams[streamInArr] = streamParsed
       else this.streams.push(streamParsed)
@@ -250,6 +261,19 @@ class Twitch {
       streamEvent.event_name = 'viewers'
       streamEvent.event_value = String(streamParsed.viewers)
       await streamEvent.save()
+
+      if (index < 3) {
+        const streamQuery = await StreamEvent.findBy('event_name', `twitch-top-${index}`)
+        const streamEvent = streamQuery || new StreamEvent()
+        streamEvent.userid = `t-${streamParsed.id}`
+        streamEvent.event_name = `twitch-top-${index}`
+        streamEvent.event_value = JSON.stringify(streamParsed.viewers)
+        streamEvent.event_extra = JSON.stringify({
+          thumbnail: streamParsed.thumbnail,
+          name: streamParsed.name
+        })
+        await streamEvent.save()
+      }
     }
 
     return Promise.resolve(this.streams.length)

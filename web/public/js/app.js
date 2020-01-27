@@ -53,7 +53,7 @@ async function getPath (fullPathArray) {
       const channel = fullPathArray[2]
       const rendered = await chart(canvasEl, id, platform, channel)
       if (!rendered) {
-
+        await chart(canvasEl, id, platform, 'top')
       }
       break
     }
@@ -61,11 +61,20 @@ async function getPath (fullPathArray) {
       const canvasEl = document.querySelector('canvas')
       if (canvasEl) {
         const id = canvasEl.id
-        window.Chart.platform.disableCSSInjection = true
-        chartData[id] = {
-          chart: null
+        const rendered = await chart(canvasEl, id, null, 'top')
+        if (!rendered) {}
+        if (chartData.top.data.length > 0) {
+          for (let i = 0; i < 3; i++) {
+            const el = document.getElementById(`top-${i}`)
+            const streamer = chartData.top.data[i]
+            if (streamer) {
+              el.querySelector('figure img').src = streamer.thumbnail
+              const title = el.querySelector('.card-header .card-header-title')
+              title.innerText = streamer.name.toUpperCase()
+              title.href = streamer.url
+            } else el.parentElement.outerHTML = ''
+          }
         }
-        chartData[id].chart = new window.Chart(canvasEl.getContext('2d'))
       }
       break
     }
@@ -202,7 +211,7 @@ async function logs (el, platform, timestamp, channel, user) {
     if (response.status === 200) {
       const logFile = await response.text()
       render(el, html`
-        <h1>${channel.toUpperCase()} <span class="is-size-6">${user ? user.toUpperCase() + ' ' : ''}logs for <span title="All timestamps are in UTC +0.">${timestamp}</span></span></h1>
+        <h1>${channel.toUpperCase()} <span class="is-size-6">${platform.toUpperCase()}, ${user ? user.toUpperCase() + ' ' : ''}logs for <span title="All timestamps are in UTC +0.">${timestamp}</span></span></h1>
         <p><a onclick="${() => { const newUrl = new URL(window.location); newUrl.searchParams.append('format', 'plain'); window.location = newUrl }}">Click here, or add <span>?format=plain</span> to current url, to only see logs.</a></p>
         <div class="logs">${logFile}</div>
       `)
@@ -279,6 +288,90 @@ async function chart (el, id, platform, channel) {
         <h1 class="title is-marginless">${channel.toUpperCase()} <span class="is-size-6">${platform.toUpperCase()}</span></h1>
       `
       el.parentElement.prepend(titleHTML)
+      return true
+    } else {
+      try {
+        const error = await response.json()
+        window.alert(`Error ${error.message}`)
+      } catch (e) {
+        window.alert(`Server returned ${response.status}: ${response.statusText}`)
+      }
+    }
+  } else if (channel === 'top') {
+    const response = await fetch(`${window.location.origin}/stats/top`, { method: 'POST' })
+    if (response.status === 200) {
+      const data = (await response.json()).sort((a, b) => Number(b.viewers) - Number(a.viewers)).filter(stream => {
+        if (platform) {
+          return stream.platform === platform.toUpperCase()
+        } else return true
+      }).map(stream => {
+        switch (stream.platform) {
+          case 'TWITCH':
+            stream.url = `https://www.twitch.tv/${stream.name}`
+            break
+          case 'MIXER':
+            stream.url = `https://mixer.com/${stream.name}`
+            break
+        }
+        return stream
+      }).slice(0, 3)
+      window.Chart.platform.disableCSSInjection = true
+      chartData[id] = {
+        chart: null,
+        data
+      }
+
+      chartData[id].chart = new window.Chart(el.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: data.map(i => `${i.platform} - ${i.name}`),
+          datasets: [{
+            label: 'Viewers',
+            borderColor: colors.malachite,
+            borderWidth: 3,
+            backgroundColor: currentFullPathArray[0] === 'stats' ? colors.onyx : colors.gunMetal,
+            data: data.map(i => Number(i.viewers))
+          }]
+        },
+        options: {
+          title: currentFullPathArray[0] === 'stats' ? {
+            display: true,
+            text: 'Viewers',
+            fontColor: colors.platinum,
+            fontSize: 16
+          } : undefined,
+          legend: {
+            display: false
+          },
+          scales: {
+            xAxes: [{
+              ticks: {
+                fontColor: colors.platinum
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                fontColor: colors.whiteSmoke
+              }
+            }]
+          },
+          tooltips: {
+            callbacks: {
+              title: function (tooltip) {
+                return new Date(chartData[this._chart.canvas.id].data[tooltip[0].index].time).toUTCString()
+              }
+            }
+          }
+        }
+      })
+      if (currentFullPathArray[0] === 'stats') {
+        const titleHTML = html.node`
+          <h1 class="title is-marginless">TOP ${data.length}${platform ? ' ' + platform.toUpperCase() : ''} <span class="is-size-6">streamers by view count.</span></h1>
+        `
+        el.parentElement.prepend(titleHTML)
+      }
+      return true
     } else {
       try {
         const error = await response.json()

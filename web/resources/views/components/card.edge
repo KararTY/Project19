@@ -1,4 +1,8 @@
-<div class="card">
+@if(id)
+  <div class="card" id="{{ id }}">
+@else
+  <div class="card">
+@endif
   @if($slot.header)
     <div class="card-header">
       @!yield($slot.header)

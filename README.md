@@ -1,7 +1,7 @@
 # Project19
 Chat bot with Web UI. Challenge for the holidays.
 
-## WORK IN PROGRESS v0.2.0
+## WORK IN PROGRESS v0.3.5
 Since the project is still a work in progress, all updates will most likely introduce breaking changes. This is not a production-ready project.
 
 ## Technologies
@@ -18,6 +18,13 @@ Since the project is still a work in progress, all updates will most likely intr
   * `npm i`
   * Copy `.env.example` and rename copy to `.env`.
   * Edit the .env file, make sure you set `APP_KEY` to something random.
+### Configuring
+  * All configurations are inside `web/config/`.
+  * Notable configuration files:
+    * db.js
+    * logs.js
+    * twitch.js
+    * mixer.js
 ### Running the bot
   * `cd .\bot\`
   * `npm i`
@@ -32,18 +39,21 @@ Since the project is still a work in progress, all updates will most likely intr
   * `npm start`
   * If the `.env` settings are default, browse to http://localhost:3333/.
 
+## Implemented features
+  * Platform support:
+    * Twitch.
+    * Mixer.
+  * Logs storage.
+  * General activity:
+    * View count every X minutes.
+
 ## Planned features
 ### High priority
-  * ~~Platform support:~~
-    * ~~Twitch.~~
-    * ~~Mixer.~~
-  * ~~Logs storage.~~
   * General chatting statistics. (+ Leaderboard system)
     * Level of user "toxicity".
     * General chat activity:
       * Chats per minute.
       * Users per minute.
-      * View count every minute.
       * Most used emotes every minute (Twitch, Mixer, BTTV, FFZ).
     * Displaying emotes in the live chat.
 ### Low priority

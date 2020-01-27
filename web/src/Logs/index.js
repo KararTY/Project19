@@ -58,16 +58,16 @@ class Logs {
   }
 
   queueWrite (json, message) {
-    if (this.enabled) {
-      let error = ''
-      if (!json) error += 'No json.'
-      else if (!message) error += 'No message.'
-      if (error.length > 0) throw new Error(error)
+    if (!this.enabled) return
 
-      this.queue.push({ json, message })
+    let error = ''
+    if (!json) error += 'No json.'
+    else if (!message) error += 'No message.'
+    if (error.length > 0) throw new Error(error)
 
-      return this.queue.length
-    }
+    this.queue.push({ json, message })
+
+    return this.queue.length
   }
 
   async writeLog ({ channel, platform, timestamp, author }, message) {
