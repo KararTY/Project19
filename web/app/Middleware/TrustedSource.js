@@ -1,7 +1,10 @@
 'use strict'
 
-const Env = use('Env')
 const Logger = use('Logger')
+
+const UnauthorizedWebsocketException = use('App/Exceptions/UnauthorizedWebsocketException')
+
+const Config = use('Adonis/Src/Config')
 
 class TrustedSource {
   /**
@@ -9,12 +12,14 @@ class TrustedSource {
    * @param {Request} ctx.request
    * @param {Function} next
    */
-  async wsHandle ({ request, response }, next) {
+  async wsHandle ({ request }, next) {
+    const trustedIPs = Config.get('trustedSources.websocketIPs')
     const ip = request.ip()
 
-    Logger.debug('[TrustedSource] IP: %s, ENV HOST: %s', ip, Env.get('HOST'))
+    Logger.info('[TrustedSource] IP: %s', ip)
 
-    if (ip !== Env.get('HOST')) return response.unauthorized('Untrusted source.')
+    if (!trustedIPs.includes(ip)) throw new UnauthorizedWebsocketException()
+
     // call next to advance the request
     await next()
   }

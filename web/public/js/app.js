@@ -362,6 +362,11 @@ async function chart (el, id, platform, channel) {
                 return new Date(chartData[this._chart.canvas.id].data[tooltip[0].index].time).toUTCString()
               }
             }
+          },
+          onClick: function (ev, el) {
+            const index = el[0]._index
+            const selection = this.data.labels[index].split(' - ')
+            window.location.href = `${window.location.origin}/stats/${selection[0].toLowerCase()}/${selection[1]}`
           }
         }
       })
