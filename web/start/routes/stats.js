@@ -26,8 +26,8 @@ Route.route('/stats/:platform?/:channelname?', async ({ params, request, respons
         for (let i = 0; i < 3; i++) {
           const topTwitchStreamer = await StreamEvent.findBy('event_name', `twitch-top-${i}`)
           const topMixerStreamer = await StreamEvent.findBy('event_name', `mixer-top-${i}`)
-          if (topTwitchStreamer) streams.push({ platform: 'TWITCH', viewers: topTwitchStreamer.event_value, time: topTwitchStreamer.updated_at, thumbnail: topTwitchStreamer.event_extra.thumbnail, name: topTwitchStreamer.event_extra.name })
-          if (topMixerStreamer) streams.push({ platform: 'MIXER', viewers: topMixerStreamer.event_value, time: topMixerStreamer.updated_at, thumbnail: topMixerStreamer.event_extra.thumbnail, name: topMixerStreamer.event_extra.name })
+          if (topTwitchStreamer && !streams.find(stream => stream.name === topTwitchStreamer.event_extra.name && stream.platform === 'TWITCH')) streams.push({ platform: 'TWITCH', viewers: topTwitchStreamer.event_value, time: topTwitchStreamer.updated_at, thumbnail: topTwitchStreamer.event_extra.thumbnail, name: topTwitchStreamer.event_extra.name })
+          if (topMixerStreamer && !streams.find(stream => stream.name === topMixerStreamer.event_extra.name && stream.platform === 'MIXER')) streams.push({ platform: 'MIXER', viewers: topMixerStreamer.event_value, time: topMixerStreamer.updated_at, thumbnail: topMixerStreamer.event_extra.thumbnail, name: topMixerStreamer.event_extra.name })
         }
 
         topStreams.nextUpdate = new Date(new Date().getTime() + ((1000 * 60) * 5))
