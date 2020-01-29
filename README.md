@@ -30,6 +30,8 @@ Since the project is still a work in progress, all updates will most likely intr
     * logs.js
     * twitch.js
     * mixer.js
+    * trustedSources.js
+    * jokes.js
 ### Running the bot
   * `cd .\bot\`
   * `npm i`
