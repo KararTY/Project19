@@ -197,7 +197,7 @@ class Twitch {
         }
         parsedMessage.importantValue = parsedMessage.event.amount
         break
-      case 'standardpayforward': {
+      case 'standardpayforward':
         parsedMessage.event = {
           type: json.messageTypeID,
           priorGifterUserName: json.eventParams.priorGifterUserName,
@@ -206,8 +206,7 @@ class Twitch {
           recipientUserName: json.eventParams.recipientUserName
         }
         break
-      }
-      case 'rewardgift': {
+      case 'rewardgift':
         parsedMessage.event = {
           type: json.messageTypeID,
           domain: json.eventParams.domain,
@@ -217,7 +216,6 @@ class Twitch {
         }
         parsedMessage.importantValue = parsedMessage.event.totalRewardCount
         break
-      }
       default:
         Logger.warning('[Twitch] Unhandled messageType! %j', json)
         parsedMessage.event = {
