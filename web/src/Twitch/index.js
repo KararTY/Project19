@@ -207,7 +207,17 @@ class Twitch {
         }
         break
       }
-      // case 'rewardgift':
+      case 'rewardgift': {
+        parsedMessage.event = {
+          type: json.messageTypeID,
+          domain: json.eventParams.domain,
+          triggerType: json.eventParams.triggerType,
+          triggerAmount: json.eventParams.triggerAmount,
+          totalRewardCount: json.eventParams.totalRewardCount
+        }
+        parsedMessage.importantValue = parsedMessage.event.totalRewardCount
+        break
+      }
       default:
         Logger.warning('[Twitch] Unhandled messageType! %j', json)
         parsedMessage.event = {
