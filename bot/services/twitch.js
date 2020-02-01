@@ -3,9 +3,8 @@
 const { ChatClient } = require('dank-twitch-irc')
 const client = new ChatClient({ username: process.env.TWITCH_BOT_USERNAME, password: process.env.TWITCH_CHAT_TOKEN })
 
-async function initialize ({ messageClient, eventClient }, isDebug) {
+async function initialize (messageClient, isDebug) {
   let messages = []
-  let events = []
   const streamers = []
 
   async function addNewStreamer (user) {
@@ -40,10 +39,11 @@ async function initialize ({ messageClient, eventClient }, isDebug) {
   })
 
   client.on('USERNOTICE', event => {
+    const eventObj = { ...event, _type: 'event' }
     if (isDebug) console.log(`Twitch Event: #${event.channelName} ${event.displayName}: ${event.systemMessage}`)
 
-    if (String(eventClient.socket.socket.readyState) === '1') eventClient.emit('event', { twitch: event })
-    else events.push(event)
+    if (String(messageClient.socket.socket.readyState) === '1') messageClient.emit('chat', { twitch: eventObj })
+    else messages.push(eventObj)
   })
 
   messageClient.on('socketJoinAck', topic => {
@@ -55,23 +55,9 @@ async function initialize ({ messageClient, eventClient }, isDebug) {
     }
   })
 
-  eventClient.on('socketJoinAck', topic => {
-    if (topic === eventClient.socket.topic) {
-      if (events.length > 0) {
-        eventClient.emit('event', { twitchOfflineBatch: messages })
-        events = []
-      }
-    }
-  })
-
   messageClient.on('keepTwitchData', data => {
     if (data.twitch) messages.push(data.twitch)
     else if (data.twitchOfflineBatch) messages.push(...data.twitchOfflineBatch)
-  })
-
-  eventClient.on('keepTwitchData', data => {
-    if (data.twitch) events.push(data.twitch)
-    else if (data.twitchOfflineBatch) events.push(...data.twitchOfflineBatch)
   })
 
   messageClient.on('newStreamer', data => {

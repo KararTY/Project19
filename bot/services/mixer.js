@@ -6,7 +6,6 @@ const ws = require('ws')
 let isDebug
 
 let messages = []
-let events = []
 
 const client = new Mixer.Client(new Mixer.DefaultRequestRunner())
 
@@ -17,7 +16,7 @@ client.use(new Mixer.OAuthProvider(client, {
   }
 }))
 
-async function initialize ({ messageClient, eventClient }, isdebug) {
+async function initialize (messageClient, isdebug) {
   isDebug = isdebug
   const streamers = []
 
@@ -30,7 +29,7 @@ async function initialize ({ messageClient, eventClient }, isdebug) {
 
         // Our chat connection details.
         const channelConn = await new Mixer.ChatService(client).join(channelData.body.id)
-        await createChatSocket(channelData, channelConn, { messageClient, eventClient })
+        await createChatSocket(channelData, channelConn, messageClient)
         streamers.push(user.name)
       } catch (err) {
         console.error('Mixer: Something went wrong.')
@@ -48,23 +47,9 @@ async function initialize ({ messageClient, eventClient }, isdebug) {
     }
   })
 
-  eventClient.on('socketJoinAck', topic => {
-    if (topic === eventClient.socket.topic) {
-      if (events.length > 0) {
-        eventClient.emit('chat', { mixerOfflineBatch: events })
-        events = []
-      }
-    }
-  })
-
   messageClient.on('keepMixerData', data => {
     if (data.mixer) messages.push(data.mixer)
     else if (data.mixerOfflineBatch) messages.push(...data.mixerOfflineBatch)
-  })
-
-  eventClient.on('keepMixerData', data => {
-    if (data.mixer) events.push(data.mixer)
-    else if (data.mixerOfflineBatch) events.push(...data.mixerOfflineBatch)
   })
 
   messageClient.on('newStreamer', data => {
@@ -72,7 +57,7 @@ async function initialize ({ messageClient, eventClient }, isdebug) {
   })
 }
 
-async function createChatSocket (channelData, channelConn, { messageClient, eventClient }) {
+async function createChatSocket (channelData, channelConn, messageClient) {
   const { userId, id: channelId, token } = channelData.body
   const { endpoints /*, authkey */ } = channelConn.body
 
@@ -108,10 +93,12 @@ async function createChatSocket (channelData, channelConn, { messageClient, even
       event.channel = socket.__channelId
       event.channelUserId = socket.__userId
 
+      const eventObj = { ...event, _type: 'event' }
+
       if (isDebug) console.log(`Mixer Event: #${event.token} ${event.user_name}: Executed [${event.skill.skill_name}] for ${event.skill.cost} ${event.skill.currency}.`)
 
-      if (String(eventClient.socket.socket.readyState) === '1') eventClient.emit('event', { mixer: event })
-      else events.push(event)
+      if (String(messageClient.socket.socket.readyState) === '1') messageClient.emit('chat', { mixer: eventObj })
+      else messages.push(eventObj)
     })
 
     // Listen for socket errors. You will need to handle these here.
