@@ -46,7 +46,7 @@ class RawStreamEventController {
         if (json.author.username) Db.queueUser(json)
 
         const streamEvent = new StreamEvent()
-        streamEvent.userid = `${platformName.charAt(0)}-${json.channel.id}`
+        streamEvent.userid = `${platformName.charAt(0)}-${json.channel.userId}`
         streamEvent.event_name = json.event.type || json.event.currency
         streamEvent.event_value = json.importantValue
         await streamEvent.save()
@@ -71,7 +71,7 @@ class RawStreamEventController {
           if (json.author.username) Db.queueUser(json)
 
           const streamEvent = new StreamEvent()
-          streamEvent.userid = `${platformName.charAt(0)}-${json.channel.id}`
+          streamEvent.userid = `${platformName.charAt(0)}-${json.channel.userId}`
           streamEvent.event_name = json.event.type
           streamEvent.event_value = json.importantValue
           await streamEvent.save()

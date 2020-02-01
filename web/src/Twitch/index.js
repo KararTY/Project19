@@ -64,13 +64,13 @@ class Twitch {
 
     parsedMessage.channel = {
       name: json.channelName,
-      id: json.channelID
+      userId: json.channelID
     }
 
     parsedMessage.author = {
       name: json.displayName,
       username: json.senderUsername,
-      id: json.senderUserID
+      userId: json.senderUserID
     }
 
     parsedMessage.message = json.messageText
@@ -130,6 +130,7 @@ class Twitch {
     switch (json.messageTypeID) {
       case 'sub':
       case 'resub':
+      case 'extendsub':
         parsedMessage.event = {
           type: json.messageTypeID,
           subPlan: json.eventParams.subPlan,
@@ -258,7 +259,7 @@ class Twitch {
       const stream = resData[index]
 
       const streamParsed = {
-        id: stream.user_id,
+        userId: stream.user_id,
         name: stream.user_name.replace(/ /g, '').toLowerCase(),
         gameID: stream.game_id,
         thumbnail: stream.thumbnail_url.replace('{width}x{height}', '1920x1080'),
@@ -275,7 +276,7 @@ class Twitch {
       else this.streams.push(streamParsed)
 
       const streamEvent = new StreamEvent()
-      streamEvent.userid = `t-${streamParsed.id}`
+      streamEvent.userid = `t-${streamParsed.userId}`
       streamEvent.event_name = 'viewers'
       streamEvent.event_value = String(streamParsed.viewers)
       await streamEvent.save()
@@ -283,7 +284,7 @@ class Twitch {
       if (index < 3) {
         const streamQuery = await StreamEvent.findBy('event_name', `twitch-top-${index}`)
         const streamEvent = streamQuery || new StreamEvent()
-        streamEvent.userid = `t-${streamParsed.id}`
+        streamEvent.userid = `t-${streamParsed.userId}`
         streamEvent.event_name = `twitch-top-${index}`
         streamEvent.event_value = JSON.stringify(streamParsed.viewers)
         streamEvent.event_extra = JSON.stringify({

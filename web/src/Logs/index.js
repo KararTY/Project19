@@ -71,25 +71,25 @@ class Logs {
   }
 
   async writeLog ({ channel, platform, timestamp, author }, message) {
-    const pathToChannel = path.join(this.pathToLogs, platform, channel.id.toString(), timestamp.year().toString(), Number(timestamp.month() + 1).toString(), timestamp.date().toString(), '_.txt')
-    const pathToUser = path.join(pathToChannel.replace('_.txt', `${author.id}.txt`))
+    const pathToChannel = path.join(this.pathToLogs, platform, channel.userId.toString(), timestamp.year().toString(), Number(timestamp.month() + 1).toString(), timestamp.date().toString(), '_.txt')
+    const pathToUser = path.join(pathToChannel.replace('_.txt', `${author.userId}.txt`))
 
-    if (!this.streams[channel.id]) {
+    if (!this.streams[channel.userId]) {
       await mkdir(pathToChannel.replace('_.txt', ''), { recursive: true })
-      this.streams[channel.id] = new Stream(pathToChannel)
+      this.streams[channel.userId] = new Stream(pathToChannel)
     }
 
-    if (!this.streams[author.id]) {
-      await mkdir(pathToUser.replace(`${author.id}.txt`, ''), { recursive: true })
-      this.streams[author.id] = new Stream(pathToUser)
+    if (!this.streams[author.userId]) {
+      await mkdir(pathToUser.replace(`${author.userId}.txt`, ''), { recursive: true })
+      this.streams[author.userId] = new Stream(pathToUser)
     }
 
     try {
-      this.streams[channel.id].lastUpdate = new Date()
-      this.streams[author.id].lastUpdate = new Date()
+      this.streams[channel.userId].lastUpdate = new Date()
+      this.streams[author.userId].lastUpdate = new Date()
 
-      await this.streams[channel.id].write(message + '\r\n')
-      await this.streams[author.id].write(message + '\r\n')
+      await this.streams[channel.userId].write(message + '\r\n')
+      await this.streams[author.userId].write(message + '\r\n')
 
       return Promise.resolve()
     } catch (err) {

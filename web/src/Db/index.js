@@ -24,7 +24,7 @@ class Database {
 
           let cont = false
 
-          const platformUserAndChannel = `${queueItem.platform.charAt(0)}-${queueItem.author.id}-${queueItem.channel.id}`
+          const platformUserAndChannel = `${queueItem.platform.charAt(0)}-${queueItem.author.userId}-${queueItem.channel.userId}`
           if (!arr.includes(platformUserAndChannel)) {
             arr.push(platformUserAndChannel)
             cont = true
@@ -58,8 +58,8 @@ class Database {
   async handleUser (json) {
     // Order is important.
     const requests = await Promise.all([
-      User.findBy('userid', `${json.platform.charAt(0)}-${json.author.id}`),
-      User.findBy('userid', `${json.platform.charAt(0)}-${json.channel.id}`)
+      User.findBy('userid', `${json.platform.charAt(0)}-${json.author.userId}`),
+      User.findBy('userid', `${json.platform.charAt(0)}-${json.channel.userId}`)
     ])
 
     for (let index = 0; index < requests.length; index++) {
@@ -68,17 +68,19 @@ class Database {
       try {
         if (request === null) {
           request = new User()
-          request.userid = `${json.platform.charAt(0)}-${index === 0 ? json.author.id : json.channel.id}`
+          request.userid = `${json.platform.charAt(0)}-${index === 0 ? json.author.userId : json.channel.userId}`
           request.name = index === 0 ? json.author.username : json.channel.name
-          Logger.debug('[Db] New user.')
           request.platform = json.platform.toUpperCase()
-          if (index === 0) request.channels = [json.channel.id]
+
+          Logger.debug('[Db] New user.')
+
+          if (index === 0) request.channels = [json.channel.userId]
           await request.save()
         } else if (index === 0) {
           let changes = false
 
-          if (!request.channels.includes(json.channel.id)) {
-            request.channels = request.channels.concat(json.channel.id)
+          if (!request.channels.includes(json.channel.userId)) {
+            request.channels = request.channels.concat(json.channel.userId)
             changes = true
           }
 
@@ -88,7 +90,7 @@ class Database {
           }
 
           if (changes) {
-            Logger.debug(`[Db] User ${request.id} changes.`)
+            Logger.debug(`[Db] User ${request.userId} changes.`)
             await request.save()
           }
         } else if (index === 1) {
@@ -100,7 +102,7 @@ class Database {
           }
 
           if (changes) {
-            Logger.debug(`[Db] User (Channel) ${request.id} changes.`)
+            Logger.debug(`[Db] User (Channel) ${request.userId} changes.`)
             await request.save()
           }
         }

@@ -65,13 +65,14 @@ class Mixer {
 
     parsedMessage.channel = {
       name: json.token,
-      id: json.channel
+      channelId: json.channel,
+      userId: json.channelUserId
     }
 
     parsedMessage.author = {
       name: json.user_name,
       username: json.user_name,
-      id: json.user_id,
+      userId: json.user_id,
       level: json.user_level,
       ascensionLevel: json.user_ascension_level
     }

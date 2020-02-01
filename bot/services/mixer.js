@@ -29,8 +29,8 @@ async function initialize ({ messageClient, eventClient }, isdebug) {
         const channelData = await client.request('GET', `/channels/${user.name}`)
 
         // Our chat connection details.
-        const channel = await new Mixer.ChatService(client).join(channelData.body.id)
-        await createChatSocket(channelData, channel, { messageClient, eventClient })
+        const channelConn = await new Mixer.ChatService(client).join(channelData.body.id)
+        await createChatSocket(channelData, channelConn, { messageClient, eventClient })
         streamers.push(user.name)
       } catch (err) {
         console.error('Mixer: Something went wrong.')
@@ -72,21 +72,14 @@ async function initialize ({ messageClient, eventClient }, isdebug) {
   })
 }
 
-/**
- * Creates a Mixer chat socket and sets up listeners to various chat events.
- * @param {number} userId The user to authenticate as
- * @param {number} channelId The channel id to join
- * @param {string[]} endpoints An array of endpoints to connect to
- * @param {string} authkey An authentication key to connect with
- * @returns {Promise.<>}
- */
-async function createChatSocket (channelData, channel, { messageClient, eventClient }) {
-  const { /* userId, */ id: channelId, token } = channelData.body
-  const { endpoints /*, authkey */ } = channel.body
+async function createChatSocket (channelData, channelConn, { messageClient, eventClient }) {
+  const { userId, id: channelId, token } = channelData.body
+  const { endpoints /*, authkey */ } = channelConn.body
 
   const socket = new Mixer.Socket(ws, endpoints).boot()
   socket.__token = token
-  socket.__id = channelId
+  socket.__channelId = channelId
+  socket.__userId = userId
 
   // if (isDebug) console.log('Mixer:', userId, channelId, endpoints, authkey)
 
@@ -94,7 +87,7 @@ async function createChatSocket (channelData, channel, { messageClient, eventCli
     // You don't need to wait for the socket to connect before calling
     // methods. We spool them and run them when connected automatically.
     await socket.auth(channelId)
-    console.log(`Mixer: You are now Mixer authenticated in ${channelId}!`)
+    console.log(`Mixer: You are now Mixer authenticated in ${userId}!`)
 
     // Send a chat message
     // return socket.call('msg', ['Hello world!'])
@@ -102,6 +95,7 @@ async function createChatSocket (channelData, channel, { messageClient, eventCli
     // Listen for chat messages. Note you will also receive your own!
     socket.on('ChatMessage', data => {
       data.token = socket.__token.toLowerCase()
+      data.channelUserId = socket.__userId
 
       if (isDebug) console.log(`Mixer: #${data.token} ${data.user_name}: ${data.message.message.map(message => message.text).join('')}`)
 
@@ -111,7 +105,9 @@ async function createChatSocket (channelData, channel, { messageClient, eventCli
 
     socket.on('SkillAttribution', event => {
       event.token = socket.__token.toLowerCase()
-      event.channel = socket.__id
+      event.channel = socket.__channelId
+      event.channelUserId = socket.__userId
+
       if (isDebug) console.log(`Mixer Event: #${event.token} ${event.user_name}: Executed [${event.skill.skill_name}] for ${event.skill.cost} ${event.skill.currency}.`)
 
       if (String(eventClient.socket.socket.readyState) === '1') eventClient.emit('event', { mixer: event })
