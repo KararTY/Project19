@@ -67,6 +67,7 @@ Since the project is still a work in progress, all updates will most likely intr
       * Users per minute.
       * Most used emotes every minute (Twitch, Mixer, BTTV, FFZ).
     * Displaying emotes in the live chat.
+  * Adding streamers.
 ### Low priority
   * Points system (Maybe streaming site offers API for their points system?)
   * Moderation actions:

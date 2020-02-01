@@ -13,7 +13,13 @@
 |
 */
 
-require('./routes/index') // domain/
-require('./routes/live') // domain/live
-require('./routes/logs') // domain/logs
-require('./routes/stats') // domain/stats
+/** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
+const Route = use('Route')
+
+Route.get('/', 'IndexController.index').as('index')
+
+Route.get('/live/:platform?/:channel?', 'LiveController.index').as('live')
+
+Route.route('/logs/:platform?/:timestamp?/:channelname?/:username?', 'LogController.index', ['GET', 'POST']).as('logs')
+
+Route.route('/stats/:platform?/:channelname?', 'StatController.index', ['GET', 'POST']).as('stats')
