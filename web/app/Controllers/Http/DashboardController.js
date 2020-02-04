@@ -148,7 +148,7 @@ class DashboardController {
 
   async updateBots ({ response }) {
     try {
-      await Socket.sendStreamers()
+      await Socket.sendStreamers(true)
     } catch (err) {
       return response.redirect(`/dashboard?command=${err.message}`)
     }

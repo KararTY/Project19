@@ -29,7 +29,7 @@ class Socket {
     this.sendStreamers()
   }
 
-  async sendStreamers () {
+  async sendStreamers (isFromFunction) {
     const userQuery = await User.query().where('track', true).fetch()
     const streamers = userQuery.toJSON()
 
@@ -55,7 +55,7 @@ class Socket {
 
     if (handledCount !== streamers.length) {
       Logger.warning(`[Socket] Not all streamers accounted for. ${streamers.length - handledCount} unhandled streamers. Launch new bot instance!`)
-      return Promise.reject(new Error(`${streamers.length - handledCount} unhandled streamers.`))
+      if (isFromFunction) return Promise.reject(new Error(`${streamers.length - handledCount} unhandled streamers.`))
     }
   }
 }
