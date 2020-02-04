@@ -1,0 +1,41 @@
+<div class="is-hidden" id="message"></div>
+<div class="field">
+  <label class="label">Platform</label>
+  <div class="control">
+    <span class="select">
+      <select name="platform">
+        <option value="twitch" {{ web.user && web.user.platform === 'TWITCH' ? 'selected' : '' }}>Twitch</option>
+        <option value="mixer" {{ web.user && web.user.platform === 'MIXER' ? 'selected' : '' }}>Mixer</option>
+      </select>
+    </span>
+  </div>
+</div>
+<div class="field">
+  <label class="label">User name</label>
+  <div class="control">
+    <input class="input" type="text" name="name" placeholder="User name..." value="{{ web.user ? web.user.name : '' }}" required>
+  </div>
+</div>
+<div class="field">
+  <label class="label">User id</label>
+  <div class="control">
+    <input class="input" type="text" name="userid" placeholder="User id..." value="{{ web.user ? web.user.userIdNumber : '' }}" required>
+  </div>
+</div>
+<div class="field">
+  <label class="label">User rank</label>
+  <div class="control">
+    <input class="input" type="number" name="rank" min="0" placeholder="User rank..." value="{{ web.user ? web.user.rank : '' }}" required>
+  </div>
+</div>
+<div class="field">
+  <label class="label">Track?</label>
+  <div class="control">
+    <span class="select" required>
+      <select name="track">
+        <option value="false" {{ web.user && web.user.track === false ? 'selected' : ''}}>No</option>
+        <option value="true" {{ web.user && web.user.track === true ? 'selected' : ''}}>Yes</option>
+      </select>
+    </span>
+  </div>
+</div>

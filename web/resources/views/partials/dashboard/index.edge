@@ -1,0 +1,40 @@
+<div class="columns is-multiline">
+  <div class="column is-12">
+    @include('partials.dashboard.search')
+  </div>
+  <div class="column">
+    @component('components.card')
+      @slot('header')
+        <h1 class="card-header-title title">Add new</h1>
+      @endslot
+      @slot('content')
+        <form name="newUser" method="POST">
+          @include('partials.dashboard.userfields')
+          <div class="field">
+            <div class="control">
+              <button class="button" type="submit">Submit</button>
+            </div>
+          </div>
+        </form>
+      @endslot
+    @endcomponent
+    <br>
+    @component('components.card')
+      @slot('header')
+        <h1 class="card-header-title title">Commands</h1>
+      @endslot
+      @slot('content')
+        <div class="is-hidden" id="command"></div>
+        <a class="button" href="/dashboard/updatebots">Update bots</a>
+      @endslot
+    @endcomponent
+  </div>
+  <div class="column">
+    @component('components.card')
+      @slot('header')
+        <h1 class="card-header-title title">Tracking streamers</h1>
+      @endslot
+      <div class="card-content" id="tracked"></div>
+    @endcomponent
+  </div>
+</div>

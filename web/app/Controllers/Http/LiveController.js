@@ -1,28 +1,21 @@
 'use strict'
 
-const PlatformNotFoundException = use('App/Exceptions/PlatformNotFoundException')
-
 class LiveController {
   async index ({ params, request, view }) {
     const format = request.get().format
+    const { platform, channel } = request.middlewares
 
-    if (params.platform) {
-      const platform = params.platform.toLowerCase()
-
-      if (!['mixer', 'twitch'].includes(platform)) throw new PlatformNotFoundException()
-    }
-
-    if (format && format === 'plain' && params.platform && params.channel) {
+    if (format && format === 'plain' && platform && channel) {
       return view.render('partials.live-plain', {
         web: {
-          title: `Live chat - ${params.channel.toUpperCase()}`,
+          title: `Live chat - ${channel.name.toUpperCase()}`,
           navbarActive: 'live'
         }
       })
     } else {
       return view.render('core.template', {
         web: {
-          title: `Live chat${params.channel ? ` - ${params.channel.toUpperCase()}` : ''}`,
+          title: `Live chat${channel ? ` - ${channel.name.toUpperCase()}` : ''}`,
           template: 'partials.live',
           navbarActive: 'live'
         }

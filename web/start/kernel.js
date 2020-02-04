@@ -33,7 +33,14 @@ const globalMiddleware = [
 | Route.get().middleware('auth')
 |
 */
-const namedMiddleware = {}
+const namedMiddleware = {
+  TrustedSource: 'App/Middleware/TrustedSource',
+  Platform: 'App/Middleware/Platform',
+  Channel: 'App/Middleware/Channel',
+  Timestamp: 'App/Middleware/Timestamp',
+  UserByName: 'App/Middleware/UserByName',
+  UserById: 'App/Middleware/UserById'
+}
 
 Server
   .registerGlobal(globalMiddleware)

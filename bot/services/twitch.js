@@ -1,7 +1,7 @@
 'use strict'
 
 const { ChatClient } = require('dank-twitch-irc')
-const client = new ChatClient({ username: process.env.TWITCH_BOT_USERNAME, password: process.env.TWITCH_CHAT_TOKEN })
+const client = new ChatClient({ username: process.env.TWITCH_BOT_USERNAME, password: 'oauth:' + process.env.TWITCH_CHAT_TOKEN })
 
 async function initialize (messageClient, isDebug) {
   let messages = []

@@ -189,6 +189,24 @@ class Mixer {
 
     return Promise.resolve(this.streams.length)
   }
+
+  async getUser (name) {
+    const request = await fetch(`https://mixer.com/api/v1/users/search?query=${name}&limit=1`, { headers: this.defaultHeaders })
+    const response = await request.json()
+
+    const firstRes = response[0]
+
+    if (firstRes) {
+      return {
+        id: firstRes.id,
+        name: firstRes.username,
+        description: firstRes.bio,
+        avatar: firstRes.avatarUrl
+      }
+    } else {
+      throw new Error('Not found.')
+    }
+  }
 }
 
 module.exports = Mixer

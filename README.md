@@ -6,7 +6,7 @@ Chat bot with Web UI. Challenge for the holidays.
   <br>Project 19 web, click for a higher resolution picture.
 </p>
 
-## WORK IN PROGRESS v0.3.5
+## WORK IN PROGRESS v0.5.0
 Since the project is still a work in progress, all updates will most likely introduce breaking changes. This is not a production-ready project.
 
 ## Technologies

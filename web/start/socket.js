@@ -15,7 +15,7 @@
 
 const Ws = use('Ws')
 
-Ws.channel('rawchat:*', 'RawChatController').middleware(['trustedSource'])
+Ws.channel('rawchat:*', 'RawChatController').middleware(['TrustedSource'])
 Ws.channel('chat:*', 'ChatController')
 
 Ws.channel('streamevent:*', 'StreamEventController')

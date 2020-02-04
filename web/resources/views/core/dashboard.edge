@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  @include('core.head')
+  <body>
+    <div class="section">
+      <div class="container">
+        @include('partials.navbar')
+        <br>
+        @include(web.template)
+      </div>
+    </div>
+  </body>
+  {{ script('/js/lighterhtml.min@2.0.7.js') }}
+  {{ script('/js/dashboard.js') }}
+</html>

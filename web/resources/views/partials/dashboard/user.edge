@@ -1,0 +1,20 @@
+<div class="columns">
+  <div class="column" id="user">
+    @component('components.card')
+      @slot('header')
+        <h1 class="card-header-title title">Edit user</h1>
+      @endslot
+      @slot('content')
+        <form name="editUser" method="POST">
+          @include('partials.dashboard.userfields')
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button" type="submit">Submit</button>
+              <input class="button" type="submit" id="delete" value="Delete">
+            </div>
+          </div>
+        </form>
+      @endslot
+    @endcomponent
+  </div>
+</div>

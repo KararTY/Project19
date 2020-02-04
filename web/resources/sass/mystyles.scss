@@ -36,6 +36,7 @@ $body-background-color: $grey-darker;
 
 // Button
 $button-background-color: $grey-light;
+$button-disabled-background-color: rgba($grey-light, 0.5) !important;
 
 // Card component
 $card-background-color: $grey-dark;
@@ -113,6 +114,7 @@ html {
 
 // @import "../../node_modules/bulma/sass/components/_all.sass";
 @import "../../node_modules/bulma/sass/components/card.sass";
+@import "../../node_modules/bulma/sass/components/pagination.sass";
 @import "../../node_modules/bulma/sass/components/tabs.sass";
 
 // Overrides

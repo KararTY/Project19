@@ -53,7 +53,10 @@ class Socket {
       }
     }
 
-    if (handledCount !== streamers.length) Logger.warning(`[Socket] Not all streamers accounted for. ${streamers.length - handledCount} unhandled streamers. Launch new bot instance!`)
+    if (handledCount !== streamers.length) {
+      Logger.warning(`[Socket] Not all streamers accounted for. ${streamers.length - handledCount} unhandled streamers. Launch new bot instance!`)
+      throw new Error(`${streamers.length - handledCount} unhandled streamers.`)
+    }
   }
 }
 

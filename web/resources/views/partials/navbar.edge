@@ -10,6 +10,9 @@
           <li class={{ isActive(web.navbarActive, 'live') }} ><a href="/live">Live chat</a></li>
           <li class={{ isActive(web.navbarActive, 'logs') }} ><a href="/logs">Logs</a></li>
           <li class={{ isActive(web.navbarActive, 'stats') }}><a href="/stats">Stats</a></li>
+          @if(web.navbarActive === 'dashboard')
+            <li class={{ isActive(web.navbarActive, 'dashboard') }}><a href="/dashboard">Dashboard</a></li>
+          @endif
         </ul>
       </div>
     </nav>

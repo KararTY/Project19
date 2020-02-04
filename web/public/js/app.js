@@ -20,18 +20,16 @@ const colors = {
 
 async function getPath (fullPathArray) {
   const currentPath = fullPathArray[0]
+  const el = document.querySelector('.card-content.content')
+  const platform = fullPathArray[1]
   switch (currentPath) {
     case 'live': {
-      const el = document.querySelector('.card-content.content')
-      const platform = fullPathArray[1]
       const channel = fullPathArray[2]
       const rendered = await liveChat(el, platform, channel)
       if (!rendered) render(el, inputChat())
       break
     }
     case 'logs': {
-      const el = document.querySelector('.card-content.content')
-      const platform = fullPathArray[1]
       const timestamp = fullPathArray[2]
       const channel = fullPathArray[3]
       const user = fullPathArray[4]
@@ -41,7 +39,7 @@ async function getPath (fullPathArray) {
         const todayTimestamp = new Date()
         const paramTimestamp = url.searchParams.get('timestamp')
         document.querySelector('input[name="timestamp"]').valueAsDate = (timestamp ? new Date(timestamp) : (paramTimestamp ? new Date(paramTimestamp) : todayTimestamp))
-        document.querySelector('input[name="channelName"]').value = channel || url.searchParams.get('channelname')
+        document.querySelector('input[name="channelName"]').value = channel || url.searchParams.get('channel')
         document.querySelector('input[name="userName"]').value = user || url.searchParams.get('username')
       }
       break
@@ -49,7 +47,6 @@ async function getPath (fullPathArray) {
     case 'stats': {
       const canvasEl = document.querySelector('canvas')
       const id = canvasEl.id
-      const platform = fullPathArray[1]
       const channel = fullPathArray[2]
       const rendered = await chart(canvasEl, id, platform, channel)
       if (!rendered) {
@@ -97,7 +94,7 @@ function inputChat () {
     redirectUrl.searchParams.set('redirect', 'true')
 
     newUrl.searchParams.set('platform', selectedPlatformValue)
-    newUrl.searchParams.set('channelname', inputtedChannelNameValue)
+    newUrl.searchParams.set('channel', inputtedChannelNameValue)
     window.history.replaceState({}, document.title, newUrl)
 
     redirectUrl.pathname = `/live/${selectedPlatformValue}/${inputtedChannelNameValue}`
@@ -118,7 +115,7 @@ function inputChat () {
           </span>
         </div>
         <div class="control">
-          <input class="input" type="text" name="channelName" placeholder="Channel name..." value="${url.searchParams.get('channelname')}" required>
+          <input class="input" type="text" name="channelName" placeholder="Channel name..." value="${url.searchParams.get('channel')}" required>
         </div>
         <div class="control">
           <button class="button" type="submit">Search</button>
@@ -150,7 +147,7 @@ function inputLogs () {
 
     newUrl.searchParams.set('platform', selectedPlatformValue)
     newUrl.searchParams.set('timestamp', inputtedTimestampValue)
-    newUrl.searchParams.set('channelname', inputtedChannelNameValue)
+    newUrl.searchParams.set('channel', inputtedChannelNameValue)
     if (inputtedUserNameValue) newUrl.searchParams.append('username', inputtedUserNameValue)
     window.history.replaceState({}, document.title, newUrl)
 
@@ -162,7 +159,7 @@ function inputLogs () {
   const selectedPlatform = window.location.pathname.slice(1).split('/').length > 1 ? window.location.pathname.slice(1).split('/')[1].toLowerCase() : url.searchParams.get('platform')
   return html`
     <h1>Logs</h1>
-    <form name="logsSearch" onsubmit=${onsubmit}>
+    <form class="form" name="logsSearch" onsubmit=${onsubmit}>
       <div class="field has-addons">
         <div class="control">
           <span class="select">
@@ -301,7 +298,7 @@ async function chart (el, id, platform, channel) {
     const response = await fetch(`${window.location.origin}/stats/top`, { method: 'POST' })
     if (response.status === 200) {
       const data = (await response.json()).sort((a, b) => Number(b.viewers) - Number(a.viewers)).filter(stream => {
-        if (platform) {
+        if (platform && platform !== 'top') {
           return stream.platform === platform.toUpperCase()
         } else return true
       }).map(stream => {
@@ -364,9 +361,12 @@ async function chart (el, id, platform, channel) {
             }
           },
           onClick: function (ev, el) {
-            const index = el[0]._index
-            const selection = this.data.labels[index].split(' - ')
-            window.location.href = `${window.location.origin}/stats/${selection[0].toLowerCase()}/${selection[1]}`
+            const elZero = el[0]
+            if (elZero) {
+              const index = elZero._index
+              const selection = this.data.labels[index].split(' - ')
+              window.location.href = `${window.location.origin}/stats/${selection[0].toLowerCase()}/${selection[1]}`
+            }
           }
         }
       })

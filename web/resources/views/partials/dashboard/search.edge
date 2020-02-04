@@ -1,0 +1,40 @@
+@component('components.card')
+  @slot('header')
+    <h1 class="card-header-title title">Search</h1>
+  @endslot
+  @slot('content')
+    <form action="/dashboard/query" class="form">
+      <label class="label">Platform? - Track? - User id? - User name?</label>
+      <div class="field has-addons">
+        <div class="control">
+          <span class="select">
+            <select name="platform">
+              <option value="">No selection</option>
+              <option value="twitch">Twitch</option>
+              <option value="mixer">Mixer</option>
+            </select>
+          </span>
+        </div>
+        <div class="control">
+          <span class="select">
+            <select name="track">
+              <option value="">No selection</option>
+              <option value="false">Not tracked</option>
+              <option value="true">Tracked</option>
+            </select>
+          </span>
+        </div>
+        <div class="control">
+          <input class="input" type="text" name="userid" placeholder="User id">
+        </div>
+        <div class="control">
+          <input class="input" type="text" name="name" placeholder="User name">
+        </div>
+        <div class="control">
+          <button class="button" type="submit">Query</button>
+        </div>
+      </div>
+    </form>
+    </form>
+  @endslot
+@endcomponent

@@ -4,6 +4,8 @@ const { hooks } = require('@adonisjs/ignitor')
 
 hooks.after.providersBooted(async () => {
   const View = use('View')
+  const Request = use('Adonis/Src/Request')
+
   const feather = require('feather-icons')
   const moment = require('moment')
 
@@ -26,4 +28,6 @@ hooks.after.providersBooted(async () => {
     if (variable === compareTo) return 'is-active'
     else return ''
   })
+
+  Request.macro('moment', moment)
 })

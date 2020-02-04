@@ -20,6 +20,7 @@ class Twitch {
     this.streams = []
 
     this.defaultHeaders = new fetch.Headers({
+      Authorization: `Bearer ${Env.get('TWITCH_CHAT_TOKEN')}`,
       'Client-ID': Env.get('TWITCH_CLIENT_ID'),
       'User-Agent': 'Project-19/Nodejs github.com/kararty/project19'
     })
@@ -296,6 +297,24 @@ class Twitch {
     }
 
     return Promise.resolve(this.streams.length)
+  }
+
+  async getUser (name) {
+    const request = await fetch(`https://api.twitch.tv/helix/users?login=${name}`, { headers: this.defaultHeaders })
+    const response = await request.json()
+
+    const firstRes = response.data[0]
+
+    if (firstRes) {
+      return {
+        id: firstRes.id,
+        name: firstRes.login,
+        description: firstRes.description,
+        avatar: firstRes.profile_image_url
+      }
+    } else {
+      throw new Error('Not found.')
+    }
   }
 }
 

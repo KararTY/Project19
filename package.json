@@ -1,6 +1,6 @@
 {
   "name": "project19",
-  "version": "0.3.5",
+  "version": "0.5.0",
   "description": "Stream chat bot with Web UI. Challenge for the holidays.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

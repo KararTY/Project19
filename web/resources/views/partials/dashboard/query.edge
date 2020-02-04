@@ -1,0 +1,13 @@
+<div class="columns is-multiline">
+  <div class="column is-12">
+    @include('partials.dashboard.search')
+  </div>
+  <div class="column is-12">
+    @component('components.card')
+      @slot('header')
+        <h1 class="card-header-title title">Query</h1>
+      @endslot
+      <div class="card-content" id="query"></div>
+    @endcomponent
+  </div>
+</div>
