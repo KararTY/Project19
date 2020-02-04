@@ -48,7 +48,6 @@ Since the project is still a work in progress, all updates will most likely intr
 
 ## Known bugs
   * Sometimes websocket connection from bot may repeat itself if the web server was to crash / disconnect, leading to multiple single, as well as multiple batched, messages/events which ultimately crashes the bot and fills logs & connected websockets to receive repeated, already seen, messages/events.
-  * Sometimes websocket bot batch sends out normal messages as events.
 
 ## Implemented features
   * Platform support:
@@ -57,9 +56,12 @@ Since the project is still a work in progress, all updates will most likely intr
   * Logs storage.
   * General activity:
     * View count every X minutes.
-
+  * Dashboard:
+    * Adding/Removing streamers.
 ## Planned features
 ### High priority
+  * Bug fixing.
+### Low priority
   * General chatting statistics. (+ Leaderboard system)
     * Level of user "toxicity".
     * General chat activity:
@@ -67,8 +69,6 @@ Since the project is still a work in progress, all updates will most likely intr
       * Users per minute.
       * Most used emotes every minute (Twitch, Mixer, BTTV, FFZ).
     * Displaying emotes in the live chat.
-  * Adding streamers.
-### Low priority
   * Points system (Maybe streaming site offers API for their points system?)
   * Moderation actions:
     * Time out phrase list.
