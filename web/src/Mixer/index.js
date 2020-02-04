@@ -204,7 +204,7 @@ class Mixer {
         avatar: firstRes.avatarUrl
       }
     } else {
-      throw new Error('Not found.')
+      return Promise.reject(new Error('Not found.'))
     }
   }
 }

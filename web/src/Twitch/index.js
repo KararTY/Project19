@@ -313,7 +313,7 @@ class Twitch {
         avatar: firstRes.profile_image_url
       }
     } else {
-      throw new Error('Not found.')
+      return Promise.reject(new Error('Not found.'))
     }
   }
 }

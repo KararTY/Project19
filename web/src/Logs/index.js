@@ -99,7 +99,7 @@ class Logs {
   }
 
   async readLog ({ channel, platform, timestamp }, author) {
-    if (!channel) throw new Error('No channel selected.')
+    if (!channel) return Promise.reject(new Error('No channel selected.'))
 
     try {
       let file
