@@ -27,18 +27,6 @@ class Logs {
       this.queue = []
 
       if (tempQueue.length > 0) {
-        const objects = Object.keys(this.streams)
-
-        for (let i = 0; i < objects.length; i++) {
-          const streams = this.streams[objects[i]]
-
-          // Hasn't been updated for some time.
-          if (new Date() - streams.lastUpdate >= ((1000 * 60) * 5)) {
-            this.streams[objects[i]].writeStream.end()
-            delete this.streams[objects[i]]
-          }
-        }
-
         tempQueue.sort((a, b) => {
           return a.timestamp - b.timestamp
         })
@@ -46,6 +34,17 @@ class Logs {
         while (tempQueue.length) {
           const queueItem = tempQueue.shift()
           await this.writeLog(queueItem.json, queueItem.message)
+        }
+
+        const objects = Object.keys(this.streams)
+        for (let i = 0; i < objects.length; i++) {
+          const streams = this.streams[objects[i]]
+
+          // Remove stream for channels that haven't been updated for some time.
+          if (new Date() - streams.lastUpdate >= ((1000 * 60) * 5)) {
+            this.streams[objects[i]].writeStream.end()
+            delete this.streams[objects[i]]
+          }
         }
 
         Logger.info(`[Logs] Logged ${tempQueueLen} messages...`)
