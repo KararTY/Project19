@@ -89,7 +89,10 @@ class Twitch {
 
     parsedMessage.timestamp = parsedMessage.setTimestamp(json.serverTimestamp)
 
-    if (json.color) parsedMessage.color = json.color
+    if (json.color) {
+      parsedMessage.color = json.color
+      parsedMessage.colorRaw = json.colorRaw
+    }
 
     if (json.isAction) parsedMessage.action = true
 
@@ -217,6 +220,12 @@ class Twitch {
           totalRewardCount: json.eventParams.totalRewardCount
         }
         parsedMessage.importantValue = parsedMessage.event.totalRewardCount
+        break
+      case 'communitypayforward':
+        parsedMessage.event = {
+          type: json.messageTypeID,
+          priorGifterDisplayName: json.eventParams.priorGifterDisplayName
+        }
         break
       default:
         Logger.warning('[Twitch] Unhandled messageType! %j', json)
