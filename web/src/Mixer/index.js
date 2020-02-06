@@ -132,9 +132,14 @@ class Mixer {
 
       for (let index = 0; index < batch.length; index++) {
         const streamer = batch[index]
-        const request = await fetch(`https://mixer.com/api/v1/channels/${streamer}`, { headers: this.defaultHeaders })
-        const response = await request.json()
-        if (!response.error && response.online) resData.push(response)
+        try {
+          const request = await fetch(`https://mixer.com/api/v1/channels/${streamer}`, { headers: this.defaultHeaders })
+          const response = await request.json()
+          if (!response.error && response.online) resData.push(response)
+        } catch (err) {
+          Logger.error('[Mixer] Error!')
+          console.error(err)
+        }
       }
 
       if (batches.length > 1) await timeout(1000 * 300)
@@ -191,20 +196,26 @@ class Mixer {
   }
 
   async getUser (name) {
-    const request = await fetch(`https://mixer.com/api/v1/users/search?query=${name}&limit=1`, { headers: this.defaultHeaders })
-    const response = await request.json()
+    try {
+      const request = await fetch(`https://mixer.com/api/v1/users/search?query=${name}&limit=1`, { headers: this.defaultHeaders })
+      const response = await request.json()
 
-    const firstRes = response[0]
+      const firstRes = response[0]
 
-    if (firstRes) {
-      return {
-        id: firstRes.id,
-        name: firstRes.username,
-        description: firstRes.bio,
-        avatar: firstRes.avatarUrl
+      if (firstRes) {
+        return {
+          id: firstRes.id,
+          name: firstRes.username,
+          description: firstRes.bio,
+          avatar: firstRes.avatarUrl
+        }
+      } else {
+        return Promise.reject(new Error('Not found.'))
       }
-    } else {
-      return Promise.reject(new Error('Not found.'))
+    } catch (err) {
+      Logger.error('[Mixer] Error!')
+      console.error(err)
+      return Promise.reject(err)
     }
   }
 }

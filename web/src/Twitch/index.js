@@ -243,10 +243,14 @@ class Twitch {
     const resData = []
     for (let index = 0; index < batches.length; index++) {
       const batch = batches[index]
-      const request = await fetch(`https://api.twitch.tv/helix/streams?${batch.map((i, ind) => ind > 0 ? '&user_login=' + i : 'user_login=' + i).join('')}`, { headers: this.defaultHeaders })
-      const response = await request.json()
-
-      if (!response.error) resData.push(...response.data)
+      try {
+        const request = await fetch(`https://api.twitch.tv/helix/streams?${batch.map((i, ind) => ind > 0 ? '&user_login=' + i : 'user_login=' + i).join('')}`, { headers: this.defaultHeaders })
+        const response = await request.json()
+        if (!response.error) resData.push(...response.data)
+      } catch (err) {
+        Logger.error('[Twitch] Error!')
+        console.error(err)
+      }
     }
 
     resData.sort((a, b) => {
@@ -300,20 +304,26 @@ class Twitch {
   }
 
   async getUser (name) {
-    const request = await fetch(`https://api.twitch.tv/helix/users?login=${name}`, { headers: this.defaultHeaders })
-    const response = await request.json()
+    try {
+      const request = await fetch(`https://api.twitch.tv/helix/users?login=${name}`, { headers: this.defaultHeaders })
+      const response = await request.json()
 
-    const firstRes = response.data[0]
+      const firstRes = response.data[0]
 
-    if (firstRes) {
-      return {
-        id: firstRes.id,
-        name: firstRes.login,
-        description: firstRes.description,
-        avatar: firstRes.profile_image_url
+      if (firstRes) {
+        return {
+          id: firstRes.id,
+          name: firstRes.login,
+          description: firstRes.description,
+          avatar: firstRes.profile_image_url
+        }
+      } else {
+        return Promise.reject(new Error('Not found.'))
       }
-    } else {
-      return Promise.reject(new Error('Not found.'))
+    } catch (err) {
+      Logger.error('[Twitch] Error!')
+      console.error(err)
+      return Promise.reject(err)
     }
   }
 }
