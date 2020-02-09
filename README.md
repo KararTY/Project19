@@ -45,6 +45,8 @@ Since the project is still a work in progress, all updates will most likely intr
   * `npm i`
   * `npm start`
   * If the `.env` settings are default, browse to http://localhost:3333/.
+  * Dashboard url is http://localhost:3333/dashboard.
+    * Make sure to click on "Update bots" after tracking a new user.
 
 ## Known bugs
   * Sometimes websocket connection from bot may repeat itself if the web server was to crash / disconnect, leading to multiple single, as well as multiple batched, messages/events which ultimately crashes the bot and fills logs & connected websockets to receive repeated, already seen, messages/events.

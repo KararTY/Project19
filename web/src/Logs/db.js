@@ -57,7 +57,7 @@ class DbLogs {
     chatLog.userid = userId
     chatLog.channeluserid = channelUserId
     chatLog.message = message
-    chatLog.created_at = timestamp
+    chatLog.created_at = timestamp.toDate()
 
     try {
       await chatLog.save()

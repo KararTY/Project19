@@ -14,6 +14,7 @@ class UserSchema extends Schema {
 
     this.create('users', table => {
       if (isPG) table.uuid('id').unique().primary().defaultTo(this.db.raw('uuid_generate_v4()')).comment('Primary key, uuid.')
+      else table.increments()
       table.string('userid', 64).unique().notNullable().comment('User id from platform. Starts with "t-", or "m-" for respective platform(s).')
       table.enu('platform', ['TWITCH', 'MIXER']).notNullable().comment('The platform the user is in.')
       table.integer('rank').unsigned().notNullable().defaultTo(0).comment('Bot access rank. Defaults to 0.')
