@@ -83,7 +83,7 @@ class DbLogs {
         queryBuilder.where('userid', userId)
       }
 
-      let result = (await queryBuilder.fetch()).toJSON()
+      let result = (await queryBuilder.orderBy('created_at', 'asc').fetch()).toJSON()
 
       if (result) {
         // Could be heavy.
