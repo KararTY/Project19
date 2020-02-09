@@ -16,7 +16,9 @@ Since the project is still a work in progress, all updates will most likely intr
   * For the bots:
     * dank-twitch-irc
     * @mixer/client-node
-  * PostgreSQL
+  * Database support:
+    * PostgreSQL
+    * SQLite 3 (recommended for development only)
 
 ## Running it
 ### Creating the .env file
