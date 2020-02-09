@@ -18,9 +18,32 @@ class StatController {
         const streams = []
         for (let i = 0; i < 3; i++) {
           const topTwitchStreamer = await StreamEvent.findBy('event_name', `twitch-top-${i}`)
+          if (topTwitchStreamer) {
+            const json = topTwitchStreamer.toJSON()
+            if (!streams.find(stream => stream.name === json.event_extra.name && stream.platform === 'TWITCH')) {
+              streams.push({
+                platform: 'TWITCH',
+                viewers: json.event_value,
+                time: json.updated_at,
+                thumbnail: json.event_extra.thumbnail,
+                name: json.event_extra.name
+              })
+            }
+          }
+
           const topMixerStreamer = await StreamEvent.findBy('event_name', `mixer-top-${i}`)
-          if (topTwitchStreamer && !streams.find(stream => stream.name === topTwitchStreamer.event_extra.name && stream.platform === 'TWITCH')) streams.push({ platform: 'TWITCH', viewers: topTwitchStreamer.event_value, time: topTwitchStreamer.updated_at, thumbnail: topTwitchStreamer.event_extra.thumbnail, name: topTwitchStreamer.event_extra.name })
-          if (topMixerStreamer && !streams.find(stream => stream.name === topMixerStreamer.event_extra.name && stream.platform === 'MIXER')) streams.push({ platform: 'MIXER', viewers: topMixerStreamer.event_value, time: topMixerStreamer.updated_at, thumbnail: topMixerStreamer.event_extra.thumbnail, name: topMixerStreamer.event_extra.name })
+          if (topMixerStreamer) {
+            const json = topMixerStreamer.toJSON()
+            if (!streams.find(stream => stream.name === json.event_extra.name && stream.platform === 'MIXER')) {
+              streams.push({
+                platform: 'MIXER',
+                viewers: json.event_value,
+                time: json.updated_at,
+                thumbnail: json.event_extra.thumbnail,
+                name: json.event_extra.name
+              })
+            }
+          }
         }
 
         topStreams.nextUpdate = new Date(new Date().getTime() + ((1000 * 60) * 5))

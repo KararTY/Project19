@@ -23,6 +23,11 @@ class StreamEvent extends Model {
     return userid.slice(2)
   }
 
+  getEventExtra (event) {
+    if (typeof event === 'string') return JSON.parse(event)
+    else return event
+  }
+
   static get incrementing () {
     return false
   }

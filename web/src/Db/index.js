@@ -77,10 +77,12 @@ class Database {
           if (index === 0) request.channels = [json.channel.userId]
           await request.save()
         } else if (index === 0) {
+          const requestJSON = request.toJSON()
+
           let changes = false
 
-          if (!request.channels.includes(json.channel.userId)) {
-            request.channels = request.channels.concat(json.channel.userId)
+          if (!requestJSON.channels.includes(json.channel.userId)) {
+            request.channels = requestJSON.channels.concat(json.channel.userId)
             changes = true
           }
 

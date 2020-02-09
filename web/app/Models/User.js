@@ -23,6 +23,11 @@ class User extends Model {
     return userid.slice(2)
   }
 
+  getChannels (channels) {
+    if (typeof channels === 'string') return JSON.parse(channels)
+    else return channels
+  }
+
   /**
    * Sends off stringified JSON to database.
    * @param {Array} json
