@@ -1,6 +1,28 @@
 'use strict'
 
-const { readFile, path, mkdir, Stream } = require('../Utilities/filesys')
+const fs = require('fs')
+const path = require('path')
+const promisify = require('util').promisify
+
+const readFile = promisify(fs.readFile)
+const mkdir = promisify(fs.mkdir)
+
+class Stream {
+  constructor (pathToFile) {
+    this.writeStream = fs.createWriteStream(pathToFile, { flags: 'a', encoding: 'utf-8' })
+    this.lastUpdate = new Date()
+  }
+
+  write (data) {
+    return new Promise((resolve, reject) => {
+      if (!this.writeStream.write(data)) {
+        this.writeStream.once('drain', () => {
+          resolve()
+        })
+      } else resolve()
+    })
+  }
+}
 
 const Logger = use('Logger')
 
@@ -11,7 +33,7 @@ const Logger = use('Logger')
 
 // Timestamps are "moment" Date objects.
 
-class Logs {
+class FileLogs {
   constructor (Config) {
     this.Config = Config || {}
     this.pathToLogs = this.Config.get('logs.pathToFile').toString()
@@ -118,4 +140,4 @@ class Logs {
   }
 }
 
-module.exports = Logs
+module.exports = FileLogs

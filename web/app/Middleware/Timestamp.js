@@ -10,7 +10,7 @@ class Timestamp {
     if (params.timestamp) {
       request.middlewares.timestamp = params.timestamp.toLowerCase()
 
-      const regex = /[0-9]{4}-[0-9]{2}-[0-9]{2}/
+      const regex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/
 
       if (!request.middlewares.timestamp.match(regex)) throw new TimestampInvalidException()
     }

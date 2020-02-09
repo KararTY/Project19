@@ -12,11 +12,11 @@ class LogController {
     let format
     if (method === 'GET') format = request.get().format
 
-    let logFile
-    if ((channel && method === 'POST') || (format && format === 'plain')) logFile = await Logs.readLog({ channel: channel, platform, timestamp: request.moment(timestamp) }, user || undefined)
+    let log
+    if ((channel && method === 'POST') || (format && format === 'plain')) log = await Logs.readLog({ channel: channel, platform, timestamp: request.moment(timestamp) }, user || undefined)
 
     if (method === 'POST') {
-      if (logFile && logFile.length > 0) return logFile
+      if (log && log.length > 0) return log
       else throw new LogsNotFoundException()
     } else {
       return view.render((format && format === 'plain')
@@ -26,7 +26,7 @@ class LogController {
           title: `Logs${channel ? ` - ${channel.name.toUpperCase()}` : ''}${user ? ` ${user.name.toUpperCase()} ` : ''}${timestamp ? ` - ${timestamp}` : ''}`,
           template: 'partials.logs',
           navbarActive: 'logs',
-          logFile: logFile || new LogsNotFoundException()
+          logFile: log || new LogsNotFoundException()
         }
       })
     }
