@@ -13,5 +13,5 @@ module.exports = {
 
   pathToFile: path.join(__dirname, '..', '..', 'logs'),
 
-  writeTimer: (1000 * 60) * 0.1
+  writeTimer: (1000 * 60) * 1
 }

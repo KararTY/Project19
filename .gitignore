@@ -12,3 +12,6 @@ tmp
 
 # VSCode
 .vscode/
+
+# SQLite development database file.
+/web/database/development.sqlite

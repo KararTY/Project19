@@ -2,11 +2,10 @@
 
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema')
-const Env = use('Env')
 
 class ChatLogsSchema extends Schema {
   async up () {
-    if (Env.get('DB_CONNECTION') === 'pg') await this.db.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";') // For PostgreSQL only.
+    console.log('[1_chat_logs_schema.js] UP')
 
     this.create('chat_logs', async table => {
       table.increments()
@@ -18,6 +17,8 @@ class ChatLogsSchema extends Schema {
   }
 
   down () {
+    console.log('[1_chat_logs_schema.js] DOWN')
+
     this.drop('chat_logs')
   }
 }
