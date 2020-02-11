@@ -85,5 +85,8 @@ Since the project is still a work in progress, all updates will most likely intr
 ## Features for the future
   * Use a text compression algorithm for logging, maybe Huffman coding?
 
+## Contributing
+Feel free to fork & contribute. **Use the provided eslint file to lint your files.**
+
 ## ISC License
 See [LICENSE](LICENSE). Karar Al-Remahy
