@@ -130,7 +130,7 @@ async function query (el, query) {
                 <li><a class="${result.page === result.max - 1 ? 'pagination-link is-current' : 'pagination-link'}" href="${result.page === result.max ? prevURL.href : ''}">${result.page === result.max ? result.page - 1 : result.page}</a></li>
                 <li><span class="pagination-ellipsis">&hellip;</span></li>
                 <li><a class="${result.page === result.max ? 'pagination-link is-current' : 'pagination-link'}" href="${lastURL.href}">${result.max}</a></li>
-              ` : result.page > 4 ? html`
+              ` : result.max > 4 ? html`
                 <li><a class="pagination-link" href="${firstURL.href}">1</a></li>
                 <li><span class="pagination-ellipsis">&hellip;</span></li>
                 <li><a class="pagination-link" href="${prevURL.href}">${result.page - 1}</a></li>
