@@ -62,10 +62,15 @@ async function getPath (fullPathArray) {
                 </div>
               ` : ''}
               ${(platform === 'mixer' || !channel) ? html`
-              <div class="column has-text-centered">
-                <a class="button" href="/stats/mixer">Top Mixer</a>
-              </div>
-            ` : ''}
+                <div class="column has-text-centered">
+                  <a class="button" href="/stats/mixer">Top Mixer</a>
+                </div>
+              ` : ''}
+              ${!channel ? html`
+                <div class="column has-text-centered">
+                  <a class="button" href="/stats/">Top All</a>
+                </div>
+              ` : ''}
             </div>
           </div>
         </div>
