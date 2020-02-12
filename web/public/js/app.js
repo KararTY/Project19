@@ -52,6 +52,24 @@ async function getPath (fullPathArray) {
       if (!rendered) {
         await chart(canvasEl, id, platform, 'top')
       }
+      document.querySelector('.card .card-content').prepend(html.node`
+        <div class="card>
+          <div class="card-content>
+            <div class="columns">
+              ${(platform === 'twitch' || !channel) ? html`
+                <div class="column has-text-centered">
+                  <a class="button" href="/stats/twitch">Top Twitch</a>
+                </div>
+              ` : ''}
+              ${(platform === 'mixer' || !channel) ? html`
+              <div class="column has-text-centered">
+                <a class="button" href="/stats/mixer">Top Mixer</a>
+              </div>
+            ` : ''}
+            </div>
+          </div>
+        </div>
+      `)
       break
     }
     default: {
