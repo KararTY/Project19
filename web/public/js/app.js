@@ -56,19 +56,19 @@ async function getPath (fullPathArray) {
         <div class="card>
           <div class="card-content>
             <div class="columns">
-              ${(platform === 'twitch' || !channel) ? html`
+              ${((channel && platform === 'twitch') || (!channel && platform !== 'twitch')) ? html`
                 <div class="column has-text-centered">
-                  <a class="button" href="/stats/twitch">Top Twitch</a>
+                  <a class="button" href="/stats/twitch">Show Top Twitch</a>
                 </div>
               ` : ''}
-              ${(platform === 'mixer' || !channel) ? html`
+              ${((channel && platform === 'mixer') || (!channel && platform !== 'mixer')) ? html`
                 <div class="column has-text-centered">
-                  <a class="button" href="/stats/mixer">Top Mixer</a>
+                  <a class="button" href="/stats/mixer">Show Top Mixer</a>
                 </div>
               ` : ''}
-              ${!channel ? html`
+              ${(!channel && platform && platform !== 'top') ? html`
                 <div class="column has-text-centered">
-                  <a class="button" href="/stats/">Top All</a>
+                  <a class="button" href="/stats/">Show Top All</a>
                 </div>
               ` : ''}
             </div>
